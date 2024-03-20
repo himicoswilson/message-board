@@ -1,4 +1,47 @@
 <script setup>
+// 引入 Axios
+import axios from 'axios';
+import { ref } from 'vue'
+import { useRouter } from "vue-router";
+import { uuid } from 'vue3-uuid';
+
+const username = ref('')
+const password = ref('')
+const token = uuid.v4()
+const router = useRouter()
+
+// 在 Vue 组件中发送登录请求
+async function getSignup(){
+  try {
+    await axios.post('http://47.100.101.113:3000/signup', {
+      username: username.value,
+      password: password.value,
+      token: token
+    });
+    
+    // 调用登录接口 传参并登录
+    axios.post('http://47.100.101.113:3000/login', {
+      username: username.value,
+      password: password.value
+    });
+    // 将 token 存储到 localStorage
+    localStorage.setItem('token', token);
+    // 跳转到首页
+    router.push('/')
+    // eslint-disable-next-line no-undef
+    ElNotification({
+      message: 'Signup successfully!',
+      type: 'success',
+    })
+  } catch (error) {
+    // eslint-disable-next-line no-undef
+    ElNotification({
+      message: 'Fail to signup.',
+      type: 'error',
+    })
+  }
+}
+
 </script>
 
 <template>
@@ -10,7 +53,7 @@
       <input type="text" id="username" v-model="username" required>
       <label class="password" for="password">Password</label>
       <input type="password" id="password" v-model="password" required>
-      <button type="submit">Sign Up</button>
+      <button type="submit" @click="getSignup">Sign Up</button>
     </form>
     <div class="haveAccount">
       <span>Already have an account? </span>
