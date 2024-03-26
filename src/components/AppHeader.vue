@@ -1,5 +1,10 @@
 <script setup>
+// 引入 useStore
+import { useUserStore } from '../stores/userStore'
 
+const user = useUserStore()
+
+user.apiGetInfo()
 </script>
 <template>
   <div class="AppHeader">
@@ -10,8 +15,8 @@
       <div class="AppHeader-globalBar-end">
         <!-- <font-awesome-icon :icon="['fas', 'bell']" />
         <font-awesome-icon :icon="['fas', 'circle-plus']" /> -->
-        <img class="userAvatar" src="../assets/images/IMG_2233.jpg">
-        <span class="username">HimiCos</span>
+        <img class="userAvatar" :src="user.avatar_url">
+        <span class="username">{{ user.username }}</span>
       </div>
     </div>
   </div>

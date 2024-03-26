@@ -1,5 +1,9 @@
 <script setup>
 import AppHeader from '@/components/AppHeader.vue';
+// 引入 useStore
+import { useUserStore } from '../stores/userStore'
+
+const user = useUserStore()
 </script>
 
 <template>
@@ -7,40 +11,18 @@ import AppHeader from '@/components/AppHeader.vue';
     <AppHeader />
     <div class="AppContainer">
       <div class="cards">
-        <el-card class="card" shadow="hover">
-          <template #header>Yummy hamburger</template>
-          <img
-            src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
-            style="width: 100%"
-          />
-        </el-card>
-        <el-card class="card" shadow="hover">
-          <template #header>Yummy hamburger</template>
-          <img
-            src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
-            style="width: 100%"
-          />
-        </el-card>
-        <el-card class="card" shadow="hover">
-          <template #header>Yummy hamburger</template>
-          <img
-            src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
-            style="width: 100%"
-          />
-        </el-card>
-        <el-card class="card" shadow="hover">
-          <template #header>Yummy hamburger</template>
-          <img
-            src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
-            style="width: 100%"
-          />
-        </el-card>
-        <el-card class="card" shadow="hover">
-          <template #header>Yummy hamburger</template>
-          <img
-            src="https://shadow.elemecdn.com/app/element/hamburger.9cf7b091-55e9-11e9-a976-7f4d0b07eef6.png"
-            style="width: 100%"
-          />
+        <el-card v-for="o in 4" :key="o" class="card" shadow="hover">
+          <div class="cardBody">
+            <div>
+              <span class="title">Title</span>
+              <span class="time">Time</span>
+              <p>This is Message-Board Content.</p>
+            </div>
+            <div class="userData">
+              <img class="userAvatar" :src="user.avatar_url">
+              <span class="username">{{ user.username }}</span>
+            </div>
+          </div>
         </el-card>
       </div>
       <div class="aside">
@@ -68,28 +50,58 @@ import AppHeader from '@/components/AppHeader.vue';
   </div>
 </template>
 
-<style >
+<style lang="less" scoped>
 .AppContainer {
   padding: 0 50px;
   display: flex;
 }
 .cards {
-  flex: 4;
+  flex: 3;
   display: flex;
   flex-wrap: wrap;
   border-right: 1px solid #cdcdcd;
-  padding: 20px 0;
-}
-.card {
-  margin: 10px;
-
-  img {
-    border-radius: 10px;
+  padding: 20px 0  20px 0;
+  
+  .card {
+    margin: 10px;
+    width: 248px;
+    height: 160px;
+    .cardBody {
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      .title {
+      font-size: 16px;
+      font-weight: 600;
+      }
+      .time {
+        margin-left: 10px;
+        font-size: 14px;
+        color: #a8a8a7;
+      }
+      p {
+        margin-top: 10px;
+        font-size: 14px;
+        text-indent:1em;
+      }
+      .userData {
+        display: flex;
+        align-items: center;
+        margin-top: 20px;
+        
+        .userAvatar {
+          width: 22px;
+          border-radius: 50%;
+          margin-right: 5px;
+        }
+      }
+    }
   }
 }
+
 .aside {
   flex: 1;
-  margin: 30px 0 0 30px;
+  margin: 30px 0 0 50px;
 
   .postMessage {
     display: flex;
