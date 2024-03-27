@@ -5,7 +5,7 @@ export const useUserStore = defineStore({
   id: 'user',
   state: () => ({
     username: '',
-    avatar_url: ''
+    avatar_url: 'https://halo-himicos.oss-cn-beijing.aliyuncs.com/avatar-5.webp'
   }),
 
   actions: {

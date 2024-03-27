@@ -1,9 +1,25 @@
 <script setup>
 import AppHeader from '@/components/AppHeader.vue';
-// 引入 useStore
-import { useUserStore } from '../stores/userStore'
+import AppAside from '@/components/AppAside.vue';
+// 引入 usePostStore
+import { usePostStore } from '../stores/postStore'
 
-const user = useUserStore()
+const post = usePostStore()
+
+post.apiGetPosts();
+
+function formatDate(value) {
+  if (!value) return '';
+  const date = new Date(value);
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const day = date.getDate().toString().padStart(2, '0');
+  const hours = date.getHours().toString().padStart(2, '0');
+  const minutes = date.getMinutes().toString().padStart(2, '0');
+  
+  // 格式化日期為 'YYYY.MM.DD HH:mm'
+  return `${year}.${month}.${day} ${hours}:${minutes}`;
+}
 </script>
 
 <template>
@@ -11,41 +27,23 @@ const user = useUserStore()
     <AppHeader />
     <div class="AppContainer">
       <div class="cards">
-        <el-card v-for="o in 4" :key="o" class="card" shadow="hover">
+        <el-card v-for="postData in post.postObj" :key="postData" class="card" shadow="hover">
           <div class="cardBody">
-            <div>
-              <span class="title">Title</span>
-              <span class="time">Time</span>
-              <p>This is Message-Board Content.</p>
+            <div class="postInfo">
+              <span class="title">{{ postData.title }}</span>
+              <span class="time">{{ formatDate(postData.created_at) }}</span>
+            </div>
+            <div class="postContent">
+              <p>{{ postData.content }}</p>
             </div>
             <div class="userData">
-              <img class="userAvatar" :src="user.avatar_url">
-              <span class="username">{{ user.username }}</span>
+              <img class="userAvatar" :src="postData.avatar_url">
+              <span class="username">{{ postData.username }}</span>
             </div>
           </div>
         </el-card>
       </div>
-      <div class="aside">
-        <div class="postMessage">
-          <span class="postTitle">POST MESSAGE</span>
-          <el-form :model="form">
-            <el-form-item required>
-              <el-input  placeholder="Title..." />
-            </el-form-item>
-            <el-form-item required>
-              <el-input  type="textarea" placeholder="Content..." />
-            </el-form-item>
-            <div class="postButtons">
-              <el-form-item>
-              <el-button type="danger" @click="onSubmit" class="clearButton">Clear</el-button>
-              </el-form-item>
-              <el-form-item>
-                <el-button type="primary" @click="onSubmit">Submit</el-button>
-              </el-form-item>
-            </div>
-          </el-form>
-        </div>
-      </div>
+      <AppAside />
     </div>
   </div>
 </template>
@@ -65,69 +63,41 @@ const user = useUserStore()
   .card {
     margin: 10px;
     width: 248px;
-    height: 160px;
+    height: 158px;
     .cardBody {
       display: flex;
       flex-direction: column;
-      align-items: flex-end;
-      .title {
-      font-size: 16px;
-      font-weight: 600;
+      .postInfo {
+        display: flex;
+        align-items: baseline;
+        .title {
+          font-size: 20px;
+          font-weight: 600;
+        }
+        .time {
+          margin-left: 10px;
+          font-size: 12px;
+          color: #a8a8a7;
+        }
       }
-      .time {
-        margin-left: 10px;
-        font-size: 14px;
-        color: #a8a8a7;
-      }
-      p {
-        margin-top: 10px;
-        font-size: 14px;
-        text-indent:1em;
+      .postContent {
+        display: flex;
+        p {
+          margin-top: 10px;
+          font-size: 14px;
+        }
       }
       .userData {
         display: flex;
         align-items: center;
         margin-top: 20px;
+        justify-content: flex-end;
         
         .userAvatar {
           width: 22px;
           border-radius: 50%;
           margin-right: 5px;
         }
-      }
-    }
-  }
-}
-
-.aside {
-  flex: 1;
-  margin: 30px 0 0 50px;
-
-  .postMessage {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    padding: 10px 20px;
-    border: 1px solid #e4e7ed;
-    border-radius: 4px;
-
-    &:hover{
-      box-shadow: var(--el-box-shadow-light);
-    }
-
-    .postTitle {
-      margin: 10px 0 15px 0;
-      font-size: 14px;
-      font-weight: 700;
-      line-height: 24px;
-    }
-
-    .postButtons {
-      display: flex;
-      justify-content: space-between;
-
-      .clearButton {
-        width: 75.58px;
       }
     }
   }
