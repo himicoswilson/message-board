@@ -5,6 +5,7 @@ import { createPinia } from 'pinia'
 
 import App from './App.vue'
 import router from './router'
+import axios from 'axios'
 import UUID from "vue3-uuid";
 
 /* import the fontawesome core */
@@ -14,18 +15,34 @@ import {library} from '@fortawesome/fontawesome-svg-core'
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome'
 
 /* import specific icons */
-import {faBell, faCirclePlus} from '@fortawesome/free-solid-svg-icons'
+import {faRightFromBracket} from '@fortawesome/free-solid-svg-icons'
+import * as ElementPlusIconsVue from '@element-plus/icons-vue'
+
+// import every components
+import AppHeader from '@/components/AppHeader.vue'
+import AppCard from '@/components/AppCard.vue'
+import AppAside from '@/components/AppAside.vue'
 
 
 const app = createApp(App)
 
+for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
+  app.component(key, component)
+}
+
+axios.defaults.baseURL = 'http://47.100.101.113:3000'
+
 /* add icons to the library */
-library.add(faBell,faCirclePlus)
+library.add(faRightFromBracket)
 
 /* 注册 font awesome icon 全局组件 */
 app.component('font-awesome-icon', FontAwesomeIcon)
 app.use(createPinia())
 app.use(router)
 app.use(UUID)
+
+app.component('AppHeader', AppHeader)
+  .component('AppCard', AppCard)
+  .component('AppAside', AppAside)
 
 app.mount('#app')

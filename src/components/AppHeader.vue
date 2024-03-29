@@ -1,22 +1,58 @@
 <script setup>
-// 引入 useStore
-import { useUserStore } from '../stores/userStore'
+// 引入路由
+import { useRouter } from "vue-router";
+// 引入 useUserStore
+import { useUserStore } from '@/stores/userStore'
+// 引入 useRefreshStore
+import { useRefreshStore } from '@/stores/refreshStore'
+import { onBeforeMount } from 'vue';
+import { Refresh, Filter, Top, UserFilled } from "@element-plus/icons-vue";
 
+const router = useRouter()
 const user = useUserStore()
+const refresh = useRefreshStore()
 
-user.apiGetInfo()
+onBeforeMount(() => {
+  user.apiGetInfo()
+})
+
+const goHome = (() => {
+  router.push('/')
+})
+
+const refreshButton = (() => {
+  refresh.refresh()
+})
+const goTop = (() => {
+  window.scrollTo({
+    top: 0,
+    behavior: "smooth" // 讓捲動有平滑效果
+  });
+})
+
+const logout = (() => {
+  localStorage.removeItem('token');
+  router.push('/login')
+})
 </script>
 <template>
   <div class="AppHeader">
     <div class="AppHeader-globalBar">
-      <div class="AppHeader-globalBar-start">
+      <div class="AppHeader-globalBar-start" @click="goHome">
         <span class="title">Message-Board</span>
       </div>
       <div class="AppHeader-globalBar-end">
-        <!-- <font-awesome-icon :icon="['fas', 'bell']" />
-        <font-awesome-icon :icon="['fas', 'circle-plus']" /> -->
-        <img class="userAvatar" :src="user.avatar_url">
-        <span class="username">{{ user.username }}</span>
+        <el-button :icon="Refresh" circle @click="refreshButton" />
+        <el-button :icon="Filter" circle />
+        <el-button :icon="Top" circle @click="goTop" class="Top"/>
+        <el-dropdown>
+          <el-avatar :src="user.avatar_url" :size="32" :icon="UserFilled" />
+          <template #dropdown>
+            <el-dropdown-menu>
+              <el-dropdown-item @click="logout" :icon="Check">退出登录</el-dropdown-item>
+            </el-dropdown-menu>
+          </template>
+        </el-dropdown>
       </div>
     </div>
   </div>
@@ -24,16 +60,24 @@ user.apiGetInfo()
 
 <style lang="less" scoped>
 .AppHeader {
-  border-bottom: 1px solid #cdcdcd;
-  
   .AppHeader-globalBar {
     display: flex;
     padding: 16px 50px;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1000;
+    background-color: var(--color-background);
+    border-bottom: 1px solid #cdcdcd;
 
     .AppHeader-globalBar-start {
       flex: 1 1 auto;
       display: flex;
       align-items: center;
+      &:hover{
+        cursor: pointer;
+      }
 
       .title {
         font-size: 16px;
@@ -46,19 +90,8 @@ user.apiGetInfo()
       display: flex;
       align-items: center;
 
-      svg{
-        font-size: 20px;
-        margin-right: 20px;
-      }
-      .userAvatar {
-        width: 32px;
-        border-radius: 50%;
-        margin-right: 5px;
-      }
-      .username {
-        font-size: 14px;
-        font-weight: 500;
-        line-height: 21px;
+      .Top {
+        margin-right: 12px;
       }
     }
   }

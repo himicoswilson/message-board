@@ -30,12 +30,14 @@ async function getSignup(){
     ElNotification({
       message: 'Signup successfully!',
       type: 'success',
+      position: 'bottom-right',
     })
   } catch (error) {
     // eslint-disable-next-line no-undef
     ElNotification({
       message: 'Fail to signup.',
       type: 'error',
+      position: 'bottom-right',
     })
   }
 }

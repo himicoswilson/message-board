@@ -1,18 +1,45 @@
 <script setup>
 import { reactive } from 'vue'
+// 引入 useRefreshStore
+import { useRefreshStore } from '@/stores/refreshStore'
+
+const refresh = useRefreshStore()
+
 const formInline = reactive({
   title: '',
   content: ''
 })
 
 // 引入 useStore
-import { usePostStore } from '../stores/postStore'
+import { usePostStore } from '@/stores/postStore'
 
-const post = usePostStore()
+const post = usePostStore();
 
-function submitPost() {
-  post.apiPostMsg(formInline.title, formInline.content)
-}
+const submitPost = (async () => {
+  await post.apiPostMsg(formInline.title, formInline.content).then(() => {
+    refresh.refresh();
+    // eslint-disable-next-line no-undef
+    ElNotification({
+      message: 'post successfully! ',
+      type: 'success',
+      position: 'bottom-right',
+    })
+  })
+  .catch((error) => {
+    // eslint-disable-next-line no-undef
+    ElNotification({
+      message: `${error}`,
+      type: 'error',
+      position: 'bottom-right',
+    });
+  });
+  formInline.title = '';
+  formInline.content = '';
+})
+const submitClear = (() => {
+  formInline.title = '';
+  formInline.content = '';
+})
 </script>
 <template>
   <div class="aside">
@@ -47,9 +74,11 @@ function submitPost() {
     display: flex;
     flex-direction: column;
     align-items: center;
+    width: 270px;
     padding: 10px 20px;
     border: 1px solid #e4e7ed;
     border-radius: 4px;
+    position: fixed;
 
     &:hover{
       box-shadow: var(--el-box-shadow-light);

@@ -13,7 +13,7 @@ const password = ref('')
 
 async function getLogin() {
   try {
-    await user.apiLogin(username.value, password.value).then( value => {
+    await user.apiLogin(username.value, password.value).then( () => {
       // 跳转到首页
       router.push('/')
     })
@@ -21,6 +21,7 @@ async function getLogin() {
     ElNotification({
       message: 'Login successfully!',
       type: 'success',
+      position: 'bottom-right',
     })
   } catch (error) {
     console.log(error);
@@ -28,35 +29,10 @@ async function getLogin() {
     ElNotification({
       message: 'Fail to login.',
       type: 'error',
+      position: 'bottom-right',
     })
   }
 }
-// // 在 Vue 组件中发送登录请求
-// async function getLogin(){
-//   try {
-//     const response = await axios.post('http://47.100.101.113:3000/login', {
-//       username: username.value,
-//       password: password.value
-//     });
-//     // 可以在这里进行页面跳转或其他操作
-//     // 将 token 存储到 localStorage
-//     localStorage.setItem('token', response.data.token);
-//     // 跳转到首页
-//     router.push('/')
-//     // eslint-disable-next-line no-undef
-//     ElNotification({
-//       message: 'Login successfully!',
-//       type: 'success',
-//     })
-//   } catch (error) {
-//     // 处理登录失败的逻辑
-//     // eslint-disable-next-line no-undef
-//     ElNotification({
-//       message: 'Incorrect username or password.',
-//       type: 'error',
-//     })
-//   }
-// }
 
 </script>
 

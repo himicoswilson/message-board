@@ -5,7 +5,7 @@ export const useUserStore = defineStore({
   id: 'user',
   state: () => ({
     username: '',
-    avatar_url: 'https://halo-himicos.oss-cn-beijing.aliyuncs.com/avatar-5.webp'
+    avatar_url: ''
   }),
 
   actions: {
@@ -13,17 +13,21 @@ export const useUserStore = defineStore({
     async apiGetInfo(){
       // 從 localStorage 中取出 token
       const token = localStorage.getItem('token');
-      await axios.post('http://47.100.101.113:3000/user', {
+      await axios.post('/user', {
         token: token
       }).then( value => {
         const {username, avatar_url} = value.data
         this.username = username;
-        this.avatar_url = avatar_url;
+        if (avatar_url) {
+          this.avatar_url = avatar_url;
+        } else {
+          this.avatar_url = 'https://halo-himicos.oss-cn-beijing.aliyuncs.com/avatar-5.webp';
+        }
       })
     },
     // apiLogin
     async apiLogin(username, password){
-      const response = await axios.post('http://47.100.101.113:3000/login', {
+      const response = await axios.post('/login', {
         username: username,
         password: password,
       });
@@ -32,7 +36,7 @@ export const useUserStore = defineStore({
     },
     // apiSignup
     async apiSignup(username, password, token){
-      await axios.post('http://47.100.101.113:3000/signup', {
+      await axios.post('/signup', {
         username: username,
         password: password,
         token: token
