@@ -1,12 +1,25 @@
 <script setup>
 // 引入 usePostStore
 import { usePostStore } from '@/stores/postStore'
-import { onMounted } from 'vue';
+import { ref, onMounted, reactive } from 'vue';
+import { UserFilled } from "@element-plus/icons-vue";
 
 const post = usePostStore()
 
+const postsPage = ref(1);
+const isLoading = ref(false);
+// 加顏色，每個顏色都會被加入卡片背景色
+const lightColors = reactive([])
+
 onMounted(() => {
-  post.apiGetPosts();
+  post.apiGetPosts(postsPage.value);
+})
+
+const loadingPost = (async() => {
+  postsPage.value += 1;
+  await post.apiGetPosts(postsPage.value).catch(() => {
+    isLoading.value = true;
+  })
 })
 
 const formatDate = ((value) => {
@@ -24,8 +37,8 @@ const formatDate = ((value) => {
 </script>
 
 <template>
-  <div class="cards">
-    <el-card v-for="postData in post.postObj" :key="postData" class="card" shadow="hover">
+  <div class="cards" v-infinite-scroll="loadingPost" :infinite-scroll-disabled="isLoading" >
+    <el-card v-for="(postData, customIndex) in post.postObj" :key="postData" class="card" shadow="hover" :style="{ backgroundColor: lightColors[ customIndex % lightColors.length] }" >
       <div class="cardBody">
         <div class="postInfo">
           <span class="title">{{ postData.title }}</span>
@@ -35,7 +48,9 @@ const formatDate = ((value) => {
           <p>{{ postData.content }}</p>
         </div>
         <div class="userData">
-          <img class="userAvatar" :src="postData.avatar_url">
+          <el-avatar :src="postData.avatar_url" :size="22"  class="userAvatar" >
+            <el-icon size="14"><UserFilled /></el-icon>
+          </el-avatar>
           <span class="username">{{ postData.username }}</span>
         </div>
       </div>
@@ -48,13 +63,17 @@ const formatDate = ((value) => {
   flex: 3;
   display: flex;
   flex-wrap: wrap;
-  border-right: 1px solid #cdcdcd;
+  border-right: 1px solid var(--color-border);
   padding: 20px 0  20px 0;
-  
+
   .card {
     margin: 10px;
     width: 248px;
     height: 158px;
+    color: var(--color-text);
+    background-color: var(--color-card);
+    border: 1px solid var(--color-border);
+
     .cardBody {
       display: flex;
       flex-direction: column;
@@ -68,7 +87,7 @@ const formatDate = ((value) => {
         .time {
           margin-left: 10px;
           font-size: 12px;
-          color: #a8a8a7;
+          color: var(--color-time);
         }
       }
       .postContent {
@@ -85,9 +104,7 @@ const formatDate = ((value) => {
         justify-content: flex-end;
         
         .userAvatar {
-          width: 22px;
-          border-radius: 50%;
-          margin-right: 5px;
+          margin-right: 5px; 
         }
       }
     }

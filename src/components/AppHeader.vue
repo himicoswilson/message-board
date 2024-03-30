@@ -5,12 +5,14 @@ import { useRouter } from "vue-router";
 import { useUserStore } from '@/stores/userStore'
 // 引入 useRefreshStore
 import { useRefreshStore } from '@/stores/refreshStore'
-import { onBeforeMount } from 'vue';
+import { ref, onBeforeMount } from 'vue';
 import { Refresh, Filter, Top, UserFilled } from "@element-plus/icons-vue";
 
 const router = useRouter()
 const user = useUserStore()
 const refresh = useRefreshStore()
+
+const dialogVisible = ref(false);
 
 onBeforeMount(() => {
   user.apiGetInfo()
@@ -42,11 +44,39 @@ const logout = (() => {
         <span class="title">Message-Board</span>
       </div>
       <div class="AppHeader-globalBar-end">
-        <el-button :icon="Refresh" circle @click="refreshButton" />
-        <el-button :icon="Filter" circle />
-        <el-button :icon="Top" circle @click="goTop" class="Top"/>
+        <el-button :icon="Refresh" circle @click="refreshButton" class="refresh"/>
+        <!-- 篩選 -->
+        <el-button :icon="Filter" circle @click="dialogVisible = true" class="filter"/>
+        <el-dialog
+          v-model="dialogVisible"
+          title="篩選"
+          width="500"
+          :before-close="handleClose"
+        >
+          <el-form>
+            <!-- 選擇哪個用戶 -->
+            <el-select v-model="value" placeholder="請選擇用戶">
+              <el-option
+                v-for="item in options"
+                :key="item.value"
+                :label="item.label"
+                :value="item.value"
+              />
+            </el-select>
+          </el-form>
+          <template #footer>
+            <div class="dialog-footer">
+              <el-button @click="dialogVisible = false">Cancel</el-button>
+              <el-button type="primary" @click="dialogVisible = false">
+                Confirm
+              </el-button>
+            </div>
+          </template>
+        </el-dialog>
+        <el-button :icon="Top" circle @click="goTop" class="goTop"/>
+        <!-- 用戶頭像下拉選單：退出登陸 -->
         <el-dropdown>
-          <el-avatar :src="user.avatar_url" :size="32" :icon="UserFilled" />
+          <el-avatar :src="user.avatar_url" :size="32" :icon="UserFilled" class="userAvatar" />
           <template #dropdown>
             <el-dropdown-menu>
               <el-dropdown-item @click="logout" :icon="Check">退出登录</el-dropdown-item>
@@ -69,29 +99,42 @@ const logout = (() => {
     width: 100%;
     z-index: 1000;
     background-color: var(--color-background);
-    border-bottom: 1px solid #cdcdcd;
+    border-bottom: 1px solid var(--color-border);
 
     .AppHeader-globalBar-start {
       flex: 1 1 auto;
       display: flex;
       align-items: center;
-      &:hover{
-        cursor: pointer;
-      }
 
       .title {
         font-size: 16px;
         font-weight: 700;
         line-height: 24px;
+        &:hover{
+          cursor: pointer;
+        }
       }
     }
     .AppHeader-globalBar-end {
       flex: 0 1 auto;
       display: flex;
       align-items: center;
-
-      .Top {
-        margin-right: 12px;
+      .refresh,.filter,.goTop {
+        color: var(--color-text);
+        background-color: var(--color-button);
+        border: 1px solid var(--color-border);
+        &:hover{
+          background-color: var(--color-button-hover);
+        }
+        &:active{
+          background-color: var(--color-button-active);
+        }
+      }
+      .goTop {
+        margin-left: 12px;
+      }
+      .userAvatar {
+        margin-left: 12px;
       }
     }
   }

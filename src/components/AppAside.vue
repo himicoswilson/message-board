@@ -1,23 +1,18 @@
 <script setup>
 import { reactive } from 'vue'
-// 引入 useRefreshStore
-import { useRefreshStore } from '@/stores/refreshStore'
+// 引入 useStore
+import { usePostStore } from '@/stores/postStore'
 
-const refresh = useRefreshStore()
+const post = usePostStore();
 
 const formInline = reactive({
   title: '',
   content: ''
 })
 
-// 引入 useStore
-import { usePostStore } from '@/stores/postStore'
-
-const post = usePostStore();
-
 const submitPost = (async () => {
   await post.apiPostMsg(formInline.title, formInline.content).then(() => {
-    refresh.refresh();
+    post.apiGetPost()
     // eslint-disable-next-line no-undef
     ElNotification({
       message: 'post successfully! ',
@@ -76,7 +71,8 @@ const submitClear = (() => {
     align-items: center;
     width: 270px;
     padding: 10px 20px;
-    border: 1px solid #e4e7ed;
+    background-color: var(--color-card);
+    border: 1px solid var(--color-border);
     border-radius: 4px;
     position: fixed;
 

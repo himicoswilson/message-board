@@ -16,9 +16,19 @@ export const usePostStore = defineStore({
 
   actions: {
     // apiGetPosts
-    async apiGetPosts(){
-      const response = await axios.get('/getposts')
-      this.postObj = response.data
+    async apiGetPosts(page){
+      const response = await axios.get(`/getposts/${page}`)
+      if (page == 1){
+        this.postObj = response.data
+      } else {
+        this.postObj = this.postObj.concat(response.data)
+      }
+    },
+    // apiGetPost
+    async apiGetPost(){
+      const response = await axios.get(`/getpost`)
+      const newPosts = response.data
+      this.postObj.unshift(newPosts);
     },
     // apiPostMsg
     async apiPostMsg(title, content){

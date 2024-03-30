@@ -18,11 +18,7 @@ export const useUserStore = defineStore({
       }).then( value => {
         const {username, avatar_url} = value.data
         this.username = username;
-        if (avatar_url) {
-          this.avatar_url = avatar_url;
-        } else {
-          this.avatar_url = 'https://halo-himicos.oss-cn-beijing.aliyuncs.com/avatar-5.webp';
-        }
+        this.avatar_url = avatar_url;
       })
     },
     // apiLogin
