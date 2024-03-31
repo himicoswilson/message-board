@@ -5,17 +5,26 @@ import { useRouter } from "vue-router";
 import { useUserStore } from '@/stores/userStore'
 // 引入 useRefreshStore
 import { useRefreshStore } from '@/stores/refreshStore'
-import { ref, onBeforeMount } from 'vue';
-import { Refresh, Filter, Top, UserFilled } from "@element-plus/icons-vue";
+import { ref, onBeforeMount,onMounted, watch } from 'vue';
+import { Refresh, Filter, Top, UserFilled, Sunny, Moon } from "@element-plus/icons-vue";
 
 const router = useRouter()
 const user = useUserStore()
 const refresh = useRefreshStore()
 
 const dialogVisible = ref(false);
+const isDarkTheme = ref(false)
 
 onBeforeMount(() => {
   user.apiGetInfo()
+})
+
+onMounted(() => {
+  const darkMode = localStorage.getItem('theme')
+  if(darkMode==='dark'){ 
+    document.body.classList.add('dark') 
+    isDarkTheme.value = true
+  } 
 })
 
 const goHome = (() => {
@@ -36,6 +45,16 @@ const logout = (() => {
   localStorage.removeItem('token');
   router.push('/login')
 })
+
+watch(isDarkTheme, () => {
+  if( isDarkTheme.value ) {
+    document.body.classList.add('dark')
+    localStorage.setItem('theme','dark')
+  } else {
+    document.body.classList.remove('dark')
+    localStorage.setItem('theme','light')
+  }
+});
 </script>
 <template>
   <div class="AppHeader">
@@ -74,6 +93,14 @@ const logout = (() => {
           </template>
         </el-dialog>
         <el-button :icon="Top" circle @click="goTop" class="goTop"/>
+        <!-- 切換暗色模式 -->
+        <el-switch
+          v-model="isDarkTheme"
+          size="large"
+          :active-action-icon="Moon"
+          :inactive-action-icon="Sunny"
+          class="themeSwitch"
+        />
         <!-- 用戶頭像下拉選單：退出登陸 -->
         <el-dropdown>
           <el-avatar :src="user.avatar_url" :size="32" :icon="UserFilled" class="userAvatar" />
@@ -132,6 +159,12 @@ const logout = (() => {
       }
       .goTop {
         margin-left: 12px;
+      }
+      .themeSwitch {
+        margin-left: 12px;
+        --el-switch-on-color: var(--color-background-mute);
+        // --el-switch-off-color: var(--color-background-mute);
+        --el-switch-border-color: var(--color-switch-border);
       }
       .userAvatar {
         margin-left: 12px;

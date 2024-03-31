@@ -6,7 +6,10 @@
 
   --vt-c-black: #111;
   --vt-c-black-soft: #222222;
-  --vt-c-black-mute: #282828;
+  --vt-c-black-mute: #2c2c2c;
+
+  --vt-c-switch-border-light: #dcdfe6;
+  --vt-c-switch-border-dark: #4C4D4F;
 
   --vt-c-time-light: #a8a8a7;
   --vt-c-time-dark: #a19f9f;
@@ -46,6 +49,8 @@
   --color-border: var(--vt-c-divider-light-2);
   --color-border-hover: var(--vt-c-divider-light-1);
 
+  --color-switch-border: var(--vt-c-switch-border-light);
+
   --color-heading: var(--vt-c-text-light-1);
   --color-text: var(--vt-c-text-light-1);
   --color-time: var(--vt-c-time-light);
@@ -58,8 +63,28 @@
 
   --section-gap: 160px;
 }
+.dark {
+  --color-background: var(--vt-c-black);
+  --color-background-soft: var(--vt-c-black-soft);
+  --color-background-mute: var(--vt-c-black-mute);
 
-@media (prefers-color-scheme: dark) {
+  --color-border: var(--vt-c-divider-dark-2);
+  --color-border-hover: var(--vt-c-divider-dark-1);
+
+  --color-switch-border: var(--vt-c-switch-border-dark);
+
+  --color-heading: var(--vt-c-text-dark-1);
+  --color-text: var(--vt-c-text-dark-2);
+  --color-time: var(--vt-c-time-dark);
+  --color-card: var(--vt-c-card-dark);
+
+  --color-input: var(--vt-c-input-dark);
+  --color-button: var(--vt-c-button-dark);
+  --color-button-hover: var(--vt-c-button-dark-hover);
+  --color-button-active: var(--vt-c-button-dark-active);
+}
+
+/* @media (prefers-color-scheme: dark) {
   :root {
     --color-background: var(--vt-c-black);
     --color-background-soft: var(--vt-c-black-soft);
@@ -67,6 +92,8 @@
 
     --color-border: var(--vt-c-divider-dark-2);
     --color-border-hover: var(--vt-c-divider-dark-1);
+
+    --color-switch-border: var(--vt-c-switch-border-dark);
 
     --color-heading: var(--vt-c-text-dark-1);
     --color-text: var(--vt-c-text-dark-2);
@@ -78,7 +105,7 @@
     --color-button-hover: var(--vt-c-button-dark-hover);
     --color-button-active: var(--vt-c-button-dark-active);
   }
-}
+} */
 
 *,
 *::before,
