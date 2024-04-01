@@ -5,13 +5,13 @@ import axios from 'axios';
 export const usePostStore = defineStore({
   id: 'post',
   state: () => ({
-    postObj: {
+    postObj: [{
       username: '',
       avatar_url: '',
       title: '',
       content: '',
       created_at: ''
-    }
+    }],
   }),
 
   actions: {

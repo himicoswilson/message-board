@@ -149,7 +149,7 @@ watch(isDarkTheme, () => {
       .refresh,.filter,.goTop {
         color: var(--color-text);
         background-color: var(--color-button);
-        border: 1px solid var(--color-border);
+        border: 1px solid var(--color-switch-border);
         &:hover{
           background-color: var(--color-button-hover);
         }
@@ -165,6 +165,12 @@ watch(isDarkTheme, () => {
         --el-switch-on-color: var(--color-background-mute);
         // --el-switch-off-color: var(--color-background-mute);
         --el-switch-border-color: var(--color-switch-border);
+        .el-switch__core .el-switch__action {
+          background-color: var(--color-background);
+        }
+        svg {
+          color: var(--color-text);
+        }
       }
       .userAvatar {
         margin-left: 12px;

@@ -8,6 +8,7 @@ const post = usePostStore()
 
 const postsPage = ref(1);
 const isLoading = ref(false);
+
 // 加顏色，每個顏色都會被加入卡片背景色
 const lightColors = reactive([])
 
@@ -37,7 +38,7 @@ const formatDate = ((value) => {
 </script>
 
 <template>
-  <div class="cards" v-infinite-scroll="loadingPost" :infinite-scroll-disabled="isLoading" >
+  <div class="cards" v-infinite-scroll="loadingPost" :infinite-scroll-disabled="isLoading">
     <el-card v-for="(postData, customIndex) in post.postObj" :key="postData" class="card" shadow="hover" :style="{ backgroundColor: lightColors[ customIndex % lightColors.length] }" >
       <div class="cardBody">
         <div class="postInfo">

@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, reactive } from 'vue'
 // 引入 useStore
 import { useUserStore } from '../stores/userStore'
 import { useRouter } from "vue-router";
@@ -8,18 +8,32 @@ import { uuid } from 'vue3-uuid';
 const user = useUserStore()
 const router = useRouter()
 
-const username = ref('')
-const password = ref('')
+const userValidateForm = reactive({
+  username: '',
+  password: '',
+})
 const token = uuid.v4()
+const signupForm = ref();
 
+const rules = reactive({
+  username: [
+    { required: true, message: 'Please input username', trigger: 'blur' },
+    { min: 3, max: 5, message: 'Length should be 3 to 5', trigger: 'blur' },
+  ],
+  password: [
+    { required: true, message: 'Please input password', trigger: 'blur' },
+    { min: 3, max: 8, message: 'Length should be 3 to 8', trigger: 'blur' },
+  ],
+})
 
 // 在 Vue 组件中发送登录请求
-async function getSignup(){
+const getSignup = (async() => {
+  await signupForm.value.validate()
   try {
-    await user.apiSignup(username.value, password.value, token).then(value => {
+    await user.apiSignup(userValidateForm.username, userValidateForm.password, token).then(value => {
       console.log(value);
     })
-    await user.apiLogin(username.value, password.value).then(() => {
+    await user.apiLogin(userValidateForm.username, userValidateForm.password).then(() => {
       // 将 token 存储到 localStorage
       localStorage.setItem('token', token);
       // 跳转到首页
@@ -40,7 +54,7 @@ async function getSignup(){
       position: 'bottom-right',
     })
   }
-}
+});
 
 </script>
 
@@ -48,13 +62,19 @@ async function getSignup(){
   <div class="signupContainer">
     <img src="../assets/images/logo.webp" alt="this is message board logo." class="logo">
     <h1 class="signupTitle">Sign Up to MessageBoard</h1>
-    <form @submit.prevent="signup" class="signup-form">
+    <el-form class="signup-form" :model="userValidateForm" :rules="rules" ref="signupForm">
       <label class="username" for="username">Username or email address</label>
-      <input type="text" id="username" v-model="username" required>
+      <el-form-item prop="username">
+        <el-input v-model="userValidateForm.username" id="username" autofocus="true"/>
+      </el-form-item>
       <label class="password" for="password">Password</label>
-      <input type="password" id="password" v-model="password" required>
-      <button type="submit" @click="getSignup">Sign Up</button>
-    </form>
+      <el-form-item prop="password">
+        <el-input v-model="userValidateForm.password" type="password" show-password/>
+      </el-form-item>
+      <el-form-item>
+        <el-button class="signupBtn" @click="getSignup()">Sign Up</el-button>
+      </el-form-item>
+    </el-form>
     <div class="haveAccount">
       <span>Already have an account? </span>
       <RouterLink to="login">Login →</RouterLink>
@@ -77,35 +97,29 @@ async function getSignup(){
   }
   .signup-form {
     width: 300px;
-    background-color: #f6f8fa;
+    background-color: var(--color-login);
     margin: 0 auto;
     padding: 20px;
-    border: 1px solid #d0d7de;
+    border: 1px solid var(--color-border);
     border-radius: 6px;
     
     .username {
       text-align: left;
+      margin-bottom: 8px;
     }
 
     .password {
       text-align: left;
+      margin-top: -8px;
     }
 
     label {
       display: block;
       margin-bottom: 5px;
-      color: #000;
+      color: var(--color-text);
     }
 
-    input {
-      width: 100%;
-      padding: 8px;
-      margin-bottom: 10px;
-      border: 1px solid #d0d7de;
-      border-radius: 6px;
-    }
-
-    button {
+    .signupBtn {
       width: 100%;
       padding: 8px;
       background-color: #1f883d;
@@ -125,7 +139,7 @@ async function getSignup(){
     width: 300px;
     margin: 16px auto 0 auto;
     padding: 16px;
-    border: 1px solid #d0d7de;
+    border: 1px solid var(--color-border);
     border-radius: 6px;
   }
 }

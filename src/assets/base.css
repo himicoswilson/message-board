@@ -17,6 +17,9 @@
   --vt-c-card-light: #ffffff;
   --vt-c-card-dark: #191919;
 
+  --vt-c-login-light: #f6f8fa;
+  --vt-c-login-dark: #191919;
+
   --vt-c-button-light: #fff;
   --vt-c-button-dark: #191919;
   --vt-c-button-light-hover: #f3f3f3;
@@ -24,7 +27,7 @@
   --vt-c-button-light-active: #f9f9f9;
   --vt-c-button-dark-active: #3e3e3e6a;
 
-  --vt-c-input-light: #2c2c2c;
+  --vt-c-input-light: #fff;
   --vt-c-input-dark: #2c2c2c;
 
   --vt-c-indigo: #1F2328;
@@ -55,8 +58,9 @@
   --color-text: var(--vt-c-text-light-1);
   --color-time: var(--vt-c-time-light);
   --color-card: var(--vt-c-card-light);
+  --color-login: var(--vt-c-login-light);
+  
   --color-input: var(--vt-c-input-light);
-
   --color-button: var(--vt-c-button-light);
   --color-button-hover: var(--vt-c-button-light-hover);
   --color-button-active: var(--vt-c-button-light-active);
@@ -77,6 +81,7 @@
   --color-text: var(--vt-c-text-dark-2);
   --color-time: var(--vt-c-time-dark);
   --color-card: var(--vt-c-card-dark);
+  --color-login: var(--vt-c-login-dark);
 
   --color-input: var(--vt-c-input-dark);
   --color-button: var(--vt-c-button-dark);

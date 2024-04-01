@@ -1,5 +1,5 @@
 <script setup>
-import { ref } from 'vue'
+import { ref, reactive } from 'vue'
 // 引入 useStore
 import { useUserStore } from '../stores/userStore'
 // 引入路由
@@ -8,45 +8,63 @@ import { useRouter } from "vue-router";
 const user = useUserStore()
 const router = useRouter()
 
-const username = ref('')
-const password = ref('')
+const loginForm = ref();
 
-async function getLogin() {
-  try {
-    await user.apiLogin(username.value, password.value).then( () => {
-      // 跳转到首页
-      router.push('/')
-    })
+const userValidateForm = reactive({
+  username: '',
+  password: '',
+})
+
+const rules = reactive({
+  username: [
+    { required: true, message: 'Please input username', trigger: 'blur' },
+    { min: 3, max: 5, message: 'Length should be 3 to 5', trigger: 'blur' },
+  ],
+  password: [
+    { required: true, message: 'Please input password', trigger: 'blur' },
+    { min: 3, max: 8, message: 'Length should be 3 to 8', trigger: 'blur' },
+  ],
+})
+
+const getLogin = (async () => {
+  await loginForm.value.validate()
+  await user.apiLogin(userValidateForm.username, userValidateForm.password).then( () => {
+    // 跳转到首页
+    router.push('/')
     // eslint-disable-next-line no-undef
     ElNotification({
       message: 'Login successfully!',
       type: 'success',
       position: 'bottom-right',
     })
-  } catch (error) {
-    console.log(error);
+  }).catch(() => {
     // eslint-disable-next-line no-undef
     ElNotification({
       message: 'Fail to login.',
       type: 'error',
       position: 'bottom-right',
     })
-  }
-}
-
+  })
+})
 </script>
 
 <template>
   <div class="loginContainer">
     <img src="../assets/images/logo.webp" alt="this is message board logo." class="logo">
     <h1 class="loginTitle">Login to MessageBoard</h1>
-    <form @submit.prevent="login" class="login-form">
+    <el-form class="login-form" :model="userValidateForm" :rules="rules" ref="loginForm">
       <label class="username" for="username">Username or email address</label>
-      <input type="text" id="username" v-model="username" required>
+      <el-form-item prop="username">
+        <el-input v-model="userValidateForm.username" id="username" autofocus="true"/>
+      </el-form-item>
       <label class="password" for="password">Password</label>
-      <input type="password" id="password" v-model="password" required>
-      <button type="submit" @click="getLogin">Login</button>
-    </form>
+      <el-form-item prop="password">
+        <el-input v-model="userValidateForm.password" type="password" show-password/>
+      </el-form-item>
+      <el-form-item>
+        <el-button class="loginBtn" @click="getLogin()">Login</el-button>
+      </el-form-item>
+    </el-form>
     <div class="NoAccount">
       <span>New to MessageBoard? </span>
       <RouterLink to="signup">Sign up →</RouterLink>
@@ -69,35 +87,29 @@ async function getLogin() {
   }
   .login-form {
     width: 300px;
-    background-color: #f6f8fa;
+    background-color: var(--color-login);
     margin: 0 auto;
     padding: 20px;
-    border: 1px solid #d0d7de;
+    border: 1px solid var(--color-border);
     border-radius: 6px;
 
     .username {
       text-align: left;
+      margin-bottom: 8px;
     }
 
     .password {
       text-align: left;
+      margin-top: -8px;
     }
     
     label {
       display: block;
       margin-bottom: 5px;
-      color: #000;
+      color: var(--color-text);
     }
 
-    input {
-      width: 100%;
-      padding: 8px;
-      margin-bottom: 10px;
-      border: 1px solid #d0d7de;
-      border-radius: 6px;
-    }
-
-    button {
+    .loginBtn {
       width: 100%;
       padding: 8px;
       background-color: #1f883d;
@@ -117,7 +129,7 @@ async function getLogin() {
     width: 300px;
     margin: 16px auto 0 auto;
     padding: 16px;
-    border: 1px solid #d0d7de;
+    border: 1px solid var(--color-border);
     border-radius: 6px;
   }
 }

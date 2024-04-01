@@ -7,3 +7,34 @@ a,
   transition: 0.4s;
   padding: 3px;
 }
+/* 下拉選單 */
+.el-dropdown-menu {
+  background-color: var(--color-background) !important;
+}
+.el-dropdown-menu__item:not(.is-disabled):focus {
+  background-color: rgba(0, 0, 0, 0) !important;
+  color: var(--color-text) !important;
+}
+.el-popper is-pure is-light el-dropdown__popper {
+  border: 1px solid var(--color-border) !important;
+}
+.el-dropdown__popper.el-popper {
+  background: var(--color-background) !important;
+  border: 1px solid var(--color-border) !important;
+}
+.el-popper.is-light .el-popper__arrow::before {
+  background: var(--color-background) !important;
+  border: 1px solid var(--color-border) !important;
+}
+/* 輸入框 */
+.el-input {
+  --el-input-bg-color: var(--color-input) !important;
+  --el-input-border-color: var(--color-border) !important;
+  --el-input-hover-border-color: var(--color-border-hover) !important;
+  --el-input-border-radius: 6px !important;
+}
+.el-textarea {
+  --el-input-bg-color: var(--color-input) !important;
+  --el-input-border-color: var(--color-border) !important;
+  --el-input-hover-border-color: var(--color-border-hover) !important;
+}
