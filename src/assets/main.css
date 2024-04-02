@@ -38,3 +38,13 @@ a,
   --el-input-border-color: var(--color-border) !important;
   --el-input-hover-border-color: var(--color-border-hover) !important;
 }
+/* 通知 */
+.el-notification {
+  color: var(--color-text) !important;
+  background-color: var(--color-background) !important;
+  border: 1px solid var(--color-border) !important;
+}
+/* 加載 */
+.el-loading-mask {
+  background-color: var(--color-background) !important;
+}

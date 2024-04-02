@@ -28,7 +28,7 @@ const rules = reactive({
 
 // 在 Vue 组件中发送登录请求
 const getSignup = (async() => {
-  await signupForm.value.validate()
+  await signupForm.value.validate();
   try {
     await user.apiSignup(userValidateForm.username, userValidateForm.password, token).then(value => {
       console.log(value);
@@ -49,7 +49,7 @@ const getSignup = (async() => {
   } catch (error) {
     // eslint-disable-next-line no-undef
     ElNotification({
-      message: 'Fail to signup.',
+      message: `${error.response.data}`,
       type: 'error',
       position: 'bottom-right',
     })

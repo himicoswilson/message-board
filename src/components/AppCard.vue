@@ -1,25 +1,41 @@
 <script setup>
 // 引入 usePostStore
 import { usePostStore } from '@/stores/postStore'
-import { ref, onMounted, reactive } from 'vue';
+import { ref, onMounted, reactive, nextTick } from 'vue';
 import { UserFilled } from "@element-plus/icons-vue";
 
 const post = usePostStore()
 
 const postsPage = ref(1);
 const isLoading = ref(false);
+const loading = ref(true);
 
 // 加顏色，每個顏色都會被加入卡片背景色
 const lightColors = reactive([])
 
-onMounted(() => {
-  post.apiGetPosts(postsPage.value);
+const svg = `
+  <path class="path" d="
+    M 30 15
+    L 28 17
+    M 25.61 25.61
+    A 15 15, 0, 0, 1, 15 30
+    A 15 15, 0, 1, 1, 27.99 7.5
+    L 15 15
+  " style="stroke-width: 4px; fill: rgba(0, 0, 0, 0)"/>
+`
+
+onMounted(async() => {
+  await post.apiGetPosts(postsPage.value).then(() => {
+    nextTick(() => {
+      loading.value = false;
+    });
+  })
 })
 
 const loadingPost = (async() => {
   postsPage.value += 1;
   await post.apiGetPosts(postsPage.value).catch(() => {
-    isLoading.value = true;
+    isLoading.value = false;
   })
 })
 
@@ -38,7 +54,10 @@ const formatDate = ((value) => {
 </script>
 
 <template>
-  <div class="cards" v-infinite-scroll="loadingPost" :infinite-scroll-disabled="isLoading">
+  <div v-if="loading" class="cards" v-loading="loading" :element-loading-svg="svg">
+    <!-- 佔位 -->
+  </div>
+  <transition-group v-if="!loading" class="cards" v-infinite-scroll="loadingPost" :infinite-scroll-disabled="isLoading" name="fade" tag="div">
     <el-card v-for="(postData, customIndex) in post.postObj" :key="postData" class="card" shadow="hover" :style="{ backgroundColor: lightColors[ customIndex % lightColors.length] }" >
       <div class="cardBody">
         <div class="postInfo">
@@ -56,19 +75,41 @@ const formatDate = ((value) => {
         </div>
       </div>
     </el-card>
-  </div>
+  </transition-group>
 </template>
 
 <style lang="less" scoped>
+.fade-enter-active,
+.fade-leave-active,
+.fade-move {
+  transition: all 0.3s ease;
+}
+
+.fade-enter,
+.fade-leave-to {
+  opacity: 0;
+}
+
 .cards {
   flex: 3;
-  display: flex;
-  flex-wrap: wrap;
   border-right: 1px solid var(--color-border);
-  padding: 20px 0  20px 0;
+  min-height: 757px;
+  padding: 20px 38px  20px 0;
+  display: grid; /* 使用网格布局来替代 Flexbox */
+  grid-template-columns: repeat(auto-fit, minmax(248px, 1fr)); /* 按照最少 248px 的宽度自适应布局，不足时会换行 */
+  grid-auto-flow: dense; /* 当容器空间不足以放下所有项目时，尝试填充空缺位置 */
+  grid-gap: 15px;
+
+  /* 对于最后一行的卡片，取消居中对齐 */
+  &::after {
+    content: "";
+    display: inline-block;
+    width: 100%;
+    text-align: left;
+  }
 
   .card {
-    margin: 10px;
+    margin-top: 10px;
     width: 248px;
     height: 158px;
     color: var(--color-text);

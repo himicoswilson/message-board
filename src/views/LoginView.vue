@@ -27,7 +27,7 @@ const rules = reactive({
 })
 
 const getLogin = (async () => {
-  await loginForm.value.validate()
+  await loginForm.value.validate();
   await user.apiLogin(userValidateForm.username, userValidateForm.password).then( () => {
     // 跳转到首页
     router.push('/')

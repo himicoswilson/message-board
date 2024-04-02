@@ -5,7 +5,7 @@ import { useRouter } from "vue-router";
 import { useUserStore } from '@/stores/userStore'
 // 引入 useRefreshStore
 import { useRefreshStore } from '@/stores/refreshStore'
-import { ref, onBeforeMount,onMounted, watch } from 'vue';
+import { ref, onMounted, watch, nextTick } from 'vue';
 import { Refresh, Filter, Top, UserFilled, Sunny, Moon } from "@element-plus/icons-vue";
 
 const router = useRouter()
@@ -14,9 +14,14 @@ const refresh = useRefreshStore()
 
 const dialogVisible = ref(false);
 const isDarkTheme = ref(false)
+const loading = ref(true);
 
-onBeforeMount(() => {
-  user.apiGetInfo()
+onMounted(async () => {
+  await user.apiGetInfo().then(() => {
+    nextTick(() => {
+      loading.value = false
+    })
+  })
 })
 
 onMounted(() => {
@@ -102,7 +107,12 @@ watch(isDarkTheme, () => {
           class="themeSwitch"
         />
         <!-- 用戶頭像下拉選單：退出登陸 -->
-        <el-dropdown>
+        <el-skeleton v-if="loading" class="userAvatar" style="--el-skeleton-circle-size: 32px; display: flex;" animated>
+          <template #template>
+            <el-skeleton-item variant="circle" />
+          </template>
+        </el-skeleton>
+        <el-dropdown v-if="!loading">
           <el-avatar :src="user.avatar_url" :size="32" :icon="UserFilled" class="userAvatar" />
           <template #dropdown>
             <el-dropdown-menu>
@@ -117,6 +127,7 @@ watch(isDarkTheme, () => {
 
 <style lang="less" scoped>
 .AppHeader {
+  margin-bottom: 73px;
   .AppHeader-globalBar {
     display: flex;
     padding: 16px 50px;

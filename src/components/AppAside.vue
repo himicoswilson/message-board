@@ -1,16 +1,27 @@
 <script setup>
-import { reactive } from 'vue'
+import { ref, reactive } from 'vue'
 // 引入 useStore
 import { usePostStore } from '@/stores/postStore'
 
 const post = usePostStore();
 
+const postForm = ref();
 const formInline = reactive({
   title: '',
   content: ''
 })
 
+const rules = reactive({
+  title: [
+    { required: true, message: 'Please input title', trigger: 'change' },
+  ],
+  content: [
+    { required: true, message: 'Please input content', trigger: 'change' },
+  ],
+})
+
 const submitPost = (async () => {
+  await postForm.value.validate();
   await post.apiPostMsg(formInline.title, formInline.content).then(() => {
     post.apiGetPost()
     // eslint-disable-next-line no-undef
@@ -31,6 +42,7 @@ const submitPost = (async () => {
   formInline.title = '';
   formInline.content = '';
 })
+
 const submitClear = (() => {
   formInline.title = '';
   formInline.content = '';
@@ -40,11 +52,11 @@ const submitClear = (() => {
   <div class="aside">
     <div class="postMessage">
       <span class="postTitle">POST MESSAGE</span>
-      <el-form :model="formInline">
-        <el-form-item required>
+      <el-form :model="formInline" :rules="rules" ref="postForm">
+        <el-form-item prop="title">
           <el-input v-model="formInline.title"  placeholder="Title..." />
         </el-form-item>
-        <el-form-item required>
+        <el-form-item prop="content">
           <el-input v-model="formInline.content"  type="textarea" placeholder="Content..." />
         </el-form-item>
         <div class="postButtons">
@@ -63,6 +75,8 @@ const submitClear = (() => {
 <style lang="less" scoped>
 .aside {
   flex: 1;
+  display: flex;
+  justify-content: center;
   margin: 30px 0 0 50px;
 
   .postMessage {
