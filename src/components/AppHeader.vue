@@ -36,7 +36,7 @@ const goHome = (() => {
   router.push('/')
 })
 
-const refreshButton = (() => {
+const refreshBtn = (() => {
   refresh.refresh()
 })
 const goTop = (() => {
@@ -68,7 +68,8 @@ watch(isDarkTheme, () => {
         <span class="title">Message-Board</span>
       </div>
       <div class="AppHeader-globalBar-end">
-        <el-button :icon="Refresh" circle @click="refreshButton" class="refresh"/>
+        <!-- 刷新 -->
+        <el-button :icon="Refresh" circle @click="refreshBtn" class="refresh"/>
         <!-- 篩選 -->
         <el-button :icon="Filter" circle @click="dialogVisible = true" class="filter"/>
         <el-dialog
@@ -116,7 +117,7 @@ watch(isDarkTheme, () => {
           <el-avatar :src="user.avatar_url" :size="32" :icon="UserFilled" class="userAvatar" />
           <template #dropdown>
             <el-dropdown-menu>
-              <el-dropdown-item @click="logout" :icon="Check">退出登录</el-dropdown-item>
+              <el-dropdown-item @click="logout">退出登录</el-dropdown-item>
             </el-dropdown-menu>
           </template>
         </el-dropdown>
