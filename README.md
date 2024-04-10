@@ -9,7 +9,7 @@
 - [x] 留言增刪改查
 - [ ] 留言回覆功能
 - [x] 加載留言
-- [ ] 數據統計
+- [x] 數據統計
 
 ## Customize configuration
 

@@ -4,6 +4,7 @@ import axios from 'axios';
 export const useUserStore = defineStore({
   id: 'user',
   state: () => ({
+    id: '',
     username: '',
     avatar_url: ''
   }),
@@ -16,7 +17,8 @@ export const useUserStore = defineStore({
       await axios.post('/user', {
         token: token
       }).then( value => {
-        const {username, avatar_url} = value.data
+        const {username, avatar_url, id} = value.data
+        this.id = id;
         this.username = username;
         this.avatar_url = avatar_url;
       })
