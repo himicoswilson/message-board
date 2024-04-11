@@ -1,16 +1,20 @@
 <script setup>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, nextTick } from 'vue'
 // 引入 useUserStore
 import { useUserStore } from '@/stores/userStore'
 // 引入 usePostStore
 import { usePostStore } from '@/stores/postStore'
 // 引入 countStore
 import { useCountStore } from '@/stores/countStore'
+// 引入 refreshStore
+import { useRefreshStore } from '@/stores/refreshStore'
 
 const user = useUserStore();
 const post = usePostStore();
 const count = useCountStore();
+const refresh = useRefreshStore();
 
+const loading = ref(true);
 const postForm = ref();
 const formInline = reactive({
   title: '',
@@ -26,16 +30,23 @@ const rules = reactive({
   ],
 })
 
-onMounted(() => {
-  count.apiGetUserCount();
-  count.apiGetPostCount();
-  count.apiGetUserPostCount();
+onMounted(async() => {
+  await count.apiGetUserCount().then(() => {
+    nextTick(() => {
+      loading.value = false;
+    });
+  })
+  await count.apiGetPostCount();
+  await count.apiGetUserPostCount();
+  await count.apiGetUserCountCompare();
+  await count.apiGetPostCountCompare();
 })
 
 const submitPost = (async () => {
   await postForm.value.validate();
   await post.apiPostMsg(formInline.title, formInline.content).then(() => {
-    post.apiGetPost()
+    post.apiGetPost();
+    refresh.refresh();
     // eslint-disable-next-line no-undef
     ElNotification({
       message: 'post successfully! ',
@@ -61,7 +72,10 @@ const submitClear = (() => {
 })
 </script>
 <template>
-  <div class="aside">
+  <div v-if="loading" class="aside" v-loading="loading" :element-loading-svg="svg">
+    <!-- 佔位 -->
+  </div>
+  <div class="aside" v-if="!loading">
     <div class="asideContent">
       <div class="postMessage">
         <span class="postTitle">POST MESSAGE</span>
@@ -94,8 +108,24 @@ const submitClear = (() => {
       </div>
       <div class="statisticCard">
         <el-col :span="20" class="statisticCardBody">
-          <el-statistic title="User Count" :value="count.userCount" />
-          <el-statistic title="Post Count" :value="count.postCount" />
+          <div>
+            <el-statistic title="User Count" :value="count.userCount" />
+            <div class="newUserCount">
+              <el-icon>
+                <CaretTop />
+              </el-icon>
+              <span>{{ count.newUserCount  }}</span>
+            </div>
+          </div>
+          <div>
+            <el-statistic title="Post Count" :value="count.postCount" />
+            <div class="newPostCount">
+              <el-icon>
+                <CaretTop />
+              </el-icon>
+              <span>{{ count.newPostCount  }}</span>
+            </div>
+          </div>
         </el-col>
       </div>
     </div>
@@ -177,9 +207,32 @@ const submitClear = (() => {
     }
     .statisticCardBody {
       display: flex;
-      justify-content: space-around;
+      justify-content: space-between;
       width: 270px;
       padding: 20px;
+      position: relative;
+      .newUserCount {
+        position: absolute;
+        top: 50px;
+        left: 67px;
+        color: var(--el-color-success);
+        span {
+          position: absolute;
+          top: -2px;
+          left: 18px;
+        }
+      }
+      .newPostCount {
+        position: absolute;
+        top: 50px;
+        left: 193px;
+        color: var(--el-color-success);
+        span {
+          position: absolute;
+          top: -2px;
+          left: 18px;
+        }
+      }
     }
   }
 }

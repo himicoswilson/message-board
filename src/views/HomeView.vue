@@ -11,7 +11,7 @@ const refresh = useRefreshStore()
     <AppHeader />
     <div class="AppContainer">
       <AppCard :key="refresh.flag" />
-      <AppAside />
+      <AppAside :key="refresh.flag"/>
     </div>
   </div>
 </template>

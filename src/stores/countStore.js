@@ -8,6 +8,8 @@ export const useCountStore = defineStore({
     userCount: 0,
     postCount: 0,
     userPostCount: 0,
+    newUserCount: 0,
+    newPostCount: 0,
   }),
 
   actions: {
@@ -28,6 +30,16 @@ export const useCountStore = defineStore({
         user_token: token,
       })
       this.userPostCount = response.data.userPostCount
+    },
+    // apiGetUserCountCompare  
+    async apiGetUserCountCompare(){
+      const response = await axios.get('/apigetusercountcompare')
+      this.newUserCount = response.data.newUserCount
+    },
+    // apiGetPostCountCompare  
+    async apiGetPostCountCompare(){
+      const response = await axios.get('/apigetpostcountcompare')
+      this.newPostCount = response.data.newPostCount
     },
   },
 })

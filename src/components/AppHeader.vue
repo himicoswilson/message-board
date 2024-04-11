@@ -51,6 +51,18 @@ const logout = (() => {
   router.push('/login')
 })
 
+const logoff = (async() => {
+  await user.apiLogoff().then(() => {
+    // eslint-disable-next-line no-undef
+    ElNotification({
+      message: 'logoff successfully! ',
+      type: 'success',
+      position: 'bottom-right',
+    });
+    logout();
+  })
+})
+
 watch(isDarkTheme, () => {
   if( isDarkTheme.value ) {
     document.body.classList.add('dark')
@@ -117,7 +129,10 @@ watch(isDarkTheme, () => {
           <el-avatar :src="user.avatar_url" :size="32" :icon="UserFilled" class="userAvatar" />
           <template #dropdown>
             <el-dropdown-menu>
-              <el-dropdown-item @click="logout">退出登录</el-dropdown-item>
+              <el-dropdown-item @click="logout">退出登陸</el-dropdown-item>
+            </el-dropdown-menu>
+            <el-dropdown-menu>
+              <el-dropdown-item @click="logoff">註銷帳戶</el-dropdown-item>
             </el-dropdown-menu>
           </template>
         </el-dropdown>

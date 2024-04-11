@@ -4,7 +4,7 @@ import axios from 'axios';
 export const useUserStore = defineStore({
   id: 'user',
   state: () => ({
-    id: '',
+    id: 0,
     username: '',
     avatar_url: ''
   }),
@@ -39,6 +39,14 @@ export const useUserStore = defineStore({
         password: password,
         token: token
       });
-    }
+    },
+    // apiLogoff
+    async apiLogoff(){
+      // 從 localStorage 中取出 token
+      const token = localStorage.getItem('token');
+      await axios.post('/logoff', {
+        token: token
+      });
+    },
   },
 })
