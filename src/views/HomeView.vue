@@ -1,15 +1,26 @@
 <script setup>
+import { watch } from 'vue'
 // 引入 useRefreshStore
 import { useRefreshStore } from '@/stores/refreshStore'
 
 const refresh = useRefreshStore()
+
+// refresh.cardsReady && refresh.asideReady都為true時 改變
+watch(
+  () => [refresh.cardsReady, refresh.asideReady],
+  () => {
+    if (refresh.cardsReady && refresh.asideReady) {
+      refresh.switchLoading()
+    }
+  }
+)
 
 </script>
 
 <template>
   <div class="App">
     <AppHeader />
-    <div class="AppContainer">
+    <div class="AppContainer" v-loading="refresh.loading">
       <AppCard :key="refresh.flag" />
       <AppAside :key="refresh.flag"/>
     </div>

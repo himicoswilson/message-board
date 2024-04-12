@@ -65,11 +65,11 @@ const getSignup = (async() => {
     <el-form class="signup-form" :model="userValidateForm" :rules="rules" ref="signupForm">
       <label class="username" for="username">Username or email address</label>
       <el-form-item prop="username">
-        <el-input v-model="userValidateForm.username" id="username" autofocus="true"/>
+        <el-input v-model="userValidateForm.username" id="username" autofocus="true" @keyup.enter="getSignup()"/>
       </el-form-item>
       <label class="password" for="password">Password</label>
       <el-form-item prop="password">
-        <el-input v-model="userValidateForm.password" type="password" show-password/>
+        <el-input v-model="userValidateForm.password" type="password" show-password @keyup.enter="getSignup()"/>
       </el-form-item>
       <el-form-item>
         <el-button class="signupBtn" @click="getSignup()">Sign Up</el-button>

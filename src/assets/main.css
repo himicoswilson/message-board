@@ -48,3 +48,7 @@ a,
 .el-loading-mask {
   background-color: var(--color-background) !important;
 }
+/* 統計數字 */
+.el-statistic__content {
+  color: var(--color-text) !important;
+}

@@ -37,6 +37,9 @@ const goHome = (() => {
 })
 
 const refreshBtn = (() => {
+  window.scrollTo({
+    top: 0,
+  });
   refresh.refresh()
 })
 const goTop = (() => {
@@ -144,6 +147,7 @@ watch(isDarkTheme, () => {
 <style lang="less" scoped>
 .AppHeader {
   margin-bottom: 73px;
+  z-index: 1000000;
   .AppHeader-globalBar {
     display: flex;
     padding: 16px 50px;

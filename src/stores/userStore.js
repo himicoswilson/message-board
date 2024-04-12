@@ -6,7 +6,13 @@ export const useUserStore = defineStore({
   state: () => ({
     id: 0,
     username: '',
-    avatar_url: ''
+    avatar_url: '',
+    logoffUser: {
+      username: '',
+      password: '',
+      avatar_url: '',
+      deleted_at: ''
+    }
   }),
 
   actions: {
@@ -46,6 +52,26 @@ export const useUserStore = defineStore({
       const token = localStorage.getItem('token');
       await axios.post('/logoff', {
         token: token
+      });
+    },
+    // apiSearchLogoff
+    async apiSearchLogoff(username, password){
+      await axios.post('/searchlogoff', {
+        username: username,
+        password: password,
+      }).then((value) => {
+        const {username, password, avatar_url, deleted_at} = value.data
+        this.logoffUser.username = username;
+        this.logoffUser.password = password;
+        this.logoffUser.avatar_url = avatar_url;
+        this.logoffUser.deleted_at = deleted_at;
+      })
+    },
+    // apiRestoreUser
+    async apiRestoreUser(){
+      await axios.post('/restoreuser', {
+        username: this.logoffUser.username,
+        password: this.logoffUser.password,
       });
     },
   },

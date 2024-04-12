@@ -9,6 +9,7 @@ const user = useUserStore()
 const router = useRouter()
 
 const loginForm = ref();
+const dialogVisible = ref(false);
 
 const userValidateForm = reactive({
   username: '',
@@ -37,14 +38,53 @@ const getLogin = (async () => {
       type: 'success',
       position: 'bottom-right',
     })
-  }).catch(() => {
+  }).catch(async() => {
+    await user.apiSearchLogoff(userValidateForm.username, userValidateForm.password).then(() => {
+      dialogVisible.value = true
+    }).catch((error) => {
+      // eslint-disable-next-line no-undef
+      ElNotification({
+        message: `${error}`,
+        type: 'error',
+        position: 'bottom-right',
+      })
+    })
+  })
+})
+
+const restore = (async() => {
+  await user.apiRestoreUser().then(async() => {
+    await user.apiLogin(user.logoffUser.username, user.logoffUser.password).then(() => {
+      // 跳转到首页
+      router.push('/')
+      // eslint-disable-next-line no-undef
+      ElNotification({
+        message: 'Restore and Login successfully!',
+        type: 'success',
+        position: 'bottom-right',
+      })
+    })
+  }).catch((error) => {
     // eslint-disable-next-line no-undef
     ElNotification({
-      message: 'Fail to login.',
+      message: `${error}`,
       type: 'error',
       position: 'bottom-right',
     })
   })
+})
+
+const formatDate = ((value) => {
+  if (!value) return '';
+  const date = new Date(value);
+  const year = date.getFullYear();
+  const month = (date.getMonth() + 1).toString().padStart(2, '0');
+  const day = date.getDate().toString().padStart(2, '0');
+  const hours = date.getHours().toString().padStart(2, '0');
+  const minutes = date.getMinutes().toString().padStart(2, '0');
+  
+  // 格式化日期為 'YYYY.MM.DD HH:mm'
+  return `${year}.${month}.${day} ${hours}:${minutes}`;
 })
 </script>
 
@@ -55,11 +95,11 @@ const getLogin = (async () => {
     <el-form class="login-form" :model="userValidateForm" :rules="rules" ref="loginForm">
       <label class="username" for="username">Username or email address</label>
       <el-form-item prop="username">
-        <el-input v-model="userValidateForm.username" id="username" autofocus="true"/>
+        <el-input v-model="userValidateForm.username" id="username" autofocus="true" @keyup.enter="getLogin()"/>
       </el-form-item>
       <label class="password" for="password">Password</label>
       <el-form-item prop="password">
-        <el-input v-model="userValidateForm.password" type="password" show-password/>
+        <el-input v-model="userValidateForm.password" type="password" show-password @keyup.enter="getLogin()"/>
       </el-form-item>
       <el-form-item>
         <el-button class="loginBtn" @click="getLogin()">Login</el-button>
@@ -70,6 +110,27 @@ const getLogin = (async () => {
       <RouterLink to="signup">Sign up →</RouterLink>
     </div>
   </div>
+  <el-dialog
+    v-model="dialogVisible"
+    title="Warning"
+    width="500"
+    align-center
+  >
+    <div class="dialogBody">
+      <span>Your account has been cancelled. Do you want to restore it?</span>
+      <el-avatar :src="user.logoffUser.avatar_url" :size="64" :icon="UserFilled" class="userAvatar" />
+      <p>Username: {{ user.logoffUser.username }}</p>
+      <p>Logoff Time: {{ formatDate(user.logoffUser.deleted_at) }}</p>
+    </div>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="dialogVisible = false">Cancel</el-button>
+        <el-button type="primary" @click="restore">
+          Restore
+        </el-button>
+      </div>
+    </template>
+  </el-dialog>
 </template>
 
 <style lang="less" scoped>
@@ -131,6 +192,16 @@ const getLogin = (async () => {
     padding: 16px;
     border: 1px solid var(--color-border);
     border-radius: 6px;
+  }
+}
+.dialogBody {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 24px;
+  .userAvatar {
+    margin-top: 16px;
+    margin-bottom: 4px;
   }
 }
 </style>

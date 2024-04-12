@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, onMounted, nextTick } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 // 引入 useUserStore
 import { useUserStore } from '@/stores/userStore'
 // 引入 usePostStore
@@ -8,13 +8,13 @@ import { usePostStore } from '@/stores/postStore'
 import { useCountStore } from '@/stores/countStore'
 // 引入 refreshStore
 import { useRefreshStore } from '@/stores/refreshStore'
+import { UserFilled } from "@element-plus/icons-vue";
 
 const user = useUserStore();
 const post = usePostStore();
 const count = useCountStore();
 const refresh = useRefreshStore();
 
-const loading = ref(true);
 const postForm = ref();
 const formInline = reactive({
   title: '',
@@ -31,11 +31,13 @@ const rules = reactive({
 })
 
 onMounted(async() => {
-  await count.apiGetUserCount().then(() => {
-    nextTick(() => {
-      loading.value = false;
-    });
+  await count.apiGetUserCount()
+  await apiGetCountInfo().then(() => {
+    refresh.asideReady = true;
   })
+})
+
+const apiGetCountInfo = (async() => {
   await count.apiGetPostCount();
   await count.apiGetUserPostCount();
   await count.apiGetUserCountCompare();
@@ -46,7 +48,7 @@ const submitPost = (async () => {
   await postForm.value.validate();
   await post.apiPostMsg(formInline.title, formInline.content).then(() => {
     post.apiGetPost();
-    refresh.refresh();
+    apiGetCountInfo();
     // eslint-disable-next-line no-undef
     ElNotification({
       message: 'post successfully! ',
@@ -70,12 +72,16 @@ const submitClear = (() => {
   formInline.title = '';
   formInline.content = '';
 })
+
+const abs = (num) => {
+  return Math.abs(num);
+}
 </script>
 <template>
-  <div v-if="loading" class="aside" v-loading="loading" :element-loading-svg="svg">
+  <div v-if="refresh.loading" class="aside">
     <!-- 佔位 -->
   </div>
-  <div class="aside" v-if="!loading">
+  <div class="aside" v-if="!refresh.loading">
     <div class="asideContent">
       <div class="postMessage">
         <span class="postTitle">POST MESSAGE</span>
@@ -111,19 +117,35 @@ const submitClear = (() => {
           <div>
             <el-statistic title="User Count" :value="count.userCount" />
             <div class="newUserCount">
-              <el-icon>
-                <CaretTop />
-              </el-icon>
-              <span>{{ count.newUserCount  }}</span>
+              <div class="CaretTop" v-if="count.compareUserCount >= 0">
+                <el-icon >
+                  <CaretTop />
+                </el-icon>
+                <span>{{ abs(count.compareUserCount)  }}</span>
+              </div>
+              <div class="CaretBottom" v-else-if="count.compareUserCount < 0">
+                <el-icon >
+                  <CaretBottom />
+                </el-icon>
+                <span>{{ abs(count.compareUserCount)  }}</span>
+              </div>
             </div>
           </div>
           <div>
             <el-statistic title="Post Count" :value="count.postCount" />
             <div class="newPostCount">
-              <el-icon>
-                <CaretTop />
-              </el-icon>
-              <span>{{ count.newPostCount  }}</span>
+              <div class="CaretTop" v-if="count.comparePostCount >= 0">
+                <el-icon >
+                  <CaretTop />
+                </el-icon>
+                <span>{{ abs(count.comparePostCount)  }}</span>
+              </div>
+              <div class="CaretBottom" v-else-if="count.comparePostCount < 0">
+                <el-icon >
+                  <CaretBottom />
+                </el-icon>
+                <span>{{ abs(count.comparePostCount)  }}</span>
+              </div>
             </div>
           </div>
         </el-col>
@@ -215,22 +237,32 @@ const submitClear = (() => {
         position: absolute;
         top: 50px;
         left: 67px;
-        color: var(--el-color-success);
         span {
           position: absolute;
           top: -2px;
           left: 18px;
+        }
+        .CaretTop {
+          color: var(--el-color-success);
+        }
+        .CaretBottom {
+          color: var(--el-color-danger);
         }
       }
       .newPostCount {
         position: absolute;
         top: 50px;
         left: 193px;
-        color: var(--el-color-success);
         span {
           position: absolute;
           top: -2px;
           left: 18px;
+        }
+        .CaretTop {
+          color: var(--el-color-success);
+        }
+        .CaretBottom {
+          color: var(--el-color-danger);
         }
       }
     }

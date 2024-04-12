@@ -3,15 +3,17 @@
 import { usePostStore } from '@/stores/postStore'
 // 引入 useUserStore
 import { useUserStore } from '@/stores/userStore'
-import { ref, onMounted, reactive, nextTick } from 'vue';
+// 引入 useRefreshStore
+import { useRefreshStore } from '@/stores/refreshStore'
+import { ref, onMounted, reactive } from 'vue';
 import { UserFilled } from "@element-plus/icons-vue";
 
 const post = usePostStore()
 const user = useUserStore()
+const refresh = useRefreshStore()
 
 const postsPage = ref(1);
 const isLoading = ref(false);
-const loading = ref(true);
 const dialogVisible = ref(false);
 const postEditForm = ref();
 
@@ -24,16 +26,6 @@ const editPostForm = reactive({
 // 加顏色，每個顏色都會被加入卡片背景色
 const lightColors = reactive([])
 
-const svg = `
-  <path class="path" d="
-    M 30 15
-    L 28 17
-    M 25.61 25.61
-    A 15 15, 0, 0, 1, 15 30
-    A 15 15, 0, 1, 1, 27.99 7.5
-    L 15 15
-  " style="stroke-width: 4px; fill: rgba(0, 0, 0, 0)"/>
-`
 const rules = reactive({
   title: [
     { required: true, message: 'Please input title', trigger: 'change' },
@@ -45,9 +37,7 @@ const rules = reactive({
 
 onMounted(async() => {
   await post.apiGetPosts(postsPage.value).then(() => {
-    nextTick(() => {
-      loading.value = false;
-    });
+    refresh.cardsReady = true;
   })
 })
 
@@ -119,10 +109,10 @@ const deletePost = (async(id) => {
 </script>
 
 <template>
-  <div v-if="loading" class="cards" v-loading="loading" :element-loading-svg="svg">
+  <div v-if="refresh.loading" class="cardsPlace">
     <!-- 佔位 -->
   </div>
-  <transition-group v-if="!loading" class="cards" v-infinite-scroll="loadingPost" :infinite-scroll-disabled="isLoading" name="fade" tag="div">
+  <transition-group v-if="!refresh.loading" class="cards" v-infinite-scroll="loadingPost" :infinite-scroll-disabled="isLoading" name="fade" tag="div">
     <el-card v-for="(postData, customIndex) in post.postObj" :key="postData" class="card" shadow="hover" :style="{ backgroundColor: lightColors[ customIndex % lightColors.length] }" >
       <div class="cardBody">
         <div class="postArea">
@@ -196,15 +186,18 @@ const deletePost = (async(id) => {
 .fade-leave-to {
   opacity: 0;
 }
-
+.cardsPlace {
+  flex: 3;
+  min-height: 757px;
+}
 .cards {
   flex: 3;
   border-right: 1px solid var(--color-border);
   min-height: 757px;
   padding: 20px 38px  20px 0;
-  display: grid; /* 使用网格布局来替代 Flexbox */
-  grid-template-columns: repeat(auto-fit, minmax(248px, 1fr)); /* 按照最少 248px 的宽度自适应布局，不足时会换行 */
-  grid-auto-flow: dense; /* 当容器空间不足以放下所有项目时，尝试填充空缺位置 */
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(248px, 1fr));
+  grid-auto-flow: dense;
   grid-gap: 15px;
 
   /* 对于最后一行的卡片，取消居中对齐 */
