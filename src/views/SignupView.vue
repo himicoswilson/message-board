@@ -18,11 +18,11 @@ const signupForm = ref();
 const rules = reactive({
   username: [
     { required: true, message: 'Please input username', trigger: 'blur' },
-    { min: 3, max: 5, message: 'Length should be 3 to 5', trigger: 'blur' },
+    { min: 2, max: 18, message: 'Length should be 2 to 18', trigger: 'blur' },
   ],
   password: [
     { required: true, message: 'Please input password', trigger: 'blur' },
-    { min: 3, max: 8, message: 'Length should be 3 to 8', trigger: 'blur' },
+    { min: 6, max: 18, message: 'Length should be 6 to 18', trigger: 'blur' },
   ],
 })
 

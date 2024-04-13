@@ -1,8 +1,12 @@
 <script setup>
+import { Waterfall } from 'vue-waterfall-plugin-next'
+import 'vue-waterfall-plugin-next/dist/style.css'
 // 引入 usePostStore
 import { usePostStore } from '@/stores/postStore'
 // 引入 useUserStore
 import { useUserStore } from '@/stores/userStore'
+// 引入 countStore
+import { useCountStore } from '@/stores/countStore'
 // 引入 useRefreshStore
 import { useRefreshStore } from '@/stores/refreshStore'
 import { ref, onMounted, reactive } from 'vue';
@@ -10,6 +14,7 @@ import { UserFilled } from "@element-plus/icons-vue";
 
 const post = usePostStore()
 const user = useUserStore()
+const count = useCountStore();
 const refresh = useRefreshStore()
 
 const postsPage = ref(1);
@@ -22,9 +27,6 @@ const editPostForm = reactive({
   title: '',
   content: '',
 });
-
-// 加顏色，每個顏色都會被加入卡片背景色
-const lightColors = reactive([])
 
 const rules = reactive({
   title: [
@@ -91,6 +93,7 @@ const deletePost = (async(id) => {
   await post.apiDeletePost(id).then(() => {
     // 刪除成功後刪除該卡片
     post.postObj = post.postObj.filter(item => item.id !== id);
+    apiGetCountInfo();
     // eslint-disable-next-line no-undef
     ElNotification({
       message: 'Delete successfully!',
@@ -106,51 +109,72 @@ const deletePost = (async(id) => {
     })
   })
 })
+
+const apiGetCountInfo = (async() => {
+  await count.apiGetPostCount();
+  await count.apiGetUserPostCount();
+  await count.apiGetUserCountCompare();
+  await count.apiGetPostCountCompare();
+})
 </script>
 
 <template>
   <div v-if="refresh.loading" class="cardsPlace">
     <!-- 佔位 -->
   </div>
-  <transition-group v-if="!refresh.loading" class="cards" v-infinite-scroll="loadingPost" :infinite-scroll-disabled="isLoading" name="fade" tag="div">
-    <el-card v-for="(postData, customIndex) in post.postObj" :key="postData" class="card" shadow="hover" :style="{ backgroundColor: lightColors[ customIndex % lightColors.length] }" >
-      <div class="cardBody">
-        <div class="postArea">
-          <div class="postInfo">
-            <span class="title">{{ postData.title }}</span>
-            <span class="time">{{ formatDate(postData.created_at) }}</span>
+
+  <Waterfall
+    :list="post.postObj"
+    class="cards"
+    v-if="!refresh.loading"
+    :hasAroundGutter="false"
+    :gutter="12"
+    :animationDuration="1000"
+    :animationDelay="0"
+    v-infinite-scroll="loadingPost" 
+    :infinite-scroll-disabled="isLoading"
+  >
+    <template #item="{ item }">
+      <el-card :key="postData" class="card" shadow="hover" >
+        <div class="cardBody">
+          <div class="postArea">
+            <div class="postInfo">
+              <span class="title">{{ item.title }}</span>
+              <span class="time">{{ formatDate(item.created_at) }}</span>
+            </div>
+            <div class="postOperate">
+              <!-- 操作按鈕 -->
+              <el-dropdown size="small" trigger="click" v-show="item.username === user.username">
+                <font-awesome-icon :icon="['fas', 'ellipsis']" />
+                <template #dropdown>
+                  <el-dropdown-menu>
+                    <el-dropdown-item @click="editPost(item.id, item.title, item.content)">
+                      <font-awesome-icon :icon="['fas', 'pen-to-square']" />
+                      <span class="operateLabel">Edit</span>
+                    </el-dropdown-item>
+                    <el-dropdown-item @click="deletePost(item.id)">
+                      <font-awesome-icon :icon="['fas', 'trash']" />
+                      <span class="operateLabel">Delete</span>
+                    </el-dropdown-item>
+                  </el-dropdown-menu>
+                </template>
+              </el-dropdown>
+            </div>
           </div>
-          <div class="postOperate">
-            <!-- 操作按鈕 -->
-            <el-dropdown size="small" trigger="click" v-show="postData.username === user.username">
-              <font-awesome-icon :icon="['fas', 'ellipsis']" />
-              <template #dropdown>
-                <el-dropdown-menu>
-                  <el-dropdown-item @click="editPost(postData.id, postData.title, postData.content)">
-                    <font-awesome-icon :icon="['fas', 'pen-to-square']" />
-                    <span class="operateLabel">Edit</span>
-                  </el-dropdown-item>
-                  <el-dropdown-item @click="deletePost(postData.id)">
-                    <font-awesome-icon :icon="['fas', 'trash']" />
-                    <span class="operateLabel">Delete</span>
-                  </el-dropdown-item>
-                </el-dropdown-menu>
-              </template>
-            </el-dropdown>
+          <div class="postContent">
+            <p>{{ item.content }}</p>
+          </div>
+          <div class="userData">
+            <el-avatar :src="item.avatar_url" :size="22"  class="userAvatar" >
+              <el-icon size="14"><UserFilled /></el-icon>
+            </el-avatar>
+            <span class="username">{{ item.username }}</span>
           </div>
         </div>
-        <div class="postContent">
-          <p>{{ postData.content }}</p>
-        </div>
-        <div class="userData">
-          <el-avatar :src="postData.avatar_url" :size="22"  class="userAvatar" >
-            <el-icon size="14"><UserFilled /></el-icon>
-          </el-avatar>
-          <span class="username">{{ postData.username }}</span>
-        </div>
-      </div>
-    </el-card>
-  </transition-group>
+      </el-card>
+    </template>
+  </Waterfall>
+
   <el-dialog v-model="dialogVisible" title="Edit Post" width="500" draggable>
     <el-form :model="editPostForm" :rules="rules" ref="postEditForm">
       <el-form-item prop="title">
@@ -176,42 +200,18 @@ const deletePost = (async(id) => {
 </template>
 
 <style lang="less" scoped>
-.fade-enter-active,
-.fade-leave-active,
-.fade-move {
-  transition: all 0.3s ease;
-}
-
-.fade-enter,
-.fade-leave-to {
-  opacity: 0;
-}
 .cardsPlace {
   flex: 3;
-  min-height: 757px;
+  min-height: 817px;
 }
 .cards {
   flex: 3;
-  border-right: 1px solid var(--color-border);
+  background-color: #00000000;
   min-height: 757px;
-  padding: 20px 38px  20px 0;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(248px, 1fr));
-  grid-auto-flow: dense;
-  grid-gap: 15px;
-
-  /* 对于最后一行的卡片，取消居中对齐 */
-  &::after {
-    content: "";
-    display: inline-block;
-    width: 100%;
-    text-align: left;
-  }
+  margin: 30px 0;
+  padding-right: 38px;
 
   .card {
-    margin-top: 10px;
-    width: 248px;
-    height: 158px;
     color: var(--color-text);
     background-color: var(--color-card);
     border: 1px solid var(--color-border);

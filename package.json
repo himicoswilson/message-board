@@ -24,6 +24,7 @@
     "unplugin-icons": "^0.18.5",
     "vue": "^3.4.15",
     "vue-router": "^4.2.5",
+    "vue-waterfall-plugin-next": "^2.4.3",
     "vue3-uuid": "^1.0.0"
   },
   "devDependencies": {

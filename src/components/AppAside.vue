@@ -8,7 +8,6 @@ import { usePostStore } from '@/stores/postStore'
 import { useCountStore } from '@/stores/countStore'
 // 引入 refreshStore
 import { useRefreshStore } from '@/stores/refreshStore'
-import { UserFilled } from "@element-plus/icons-vue";
 
 const user = useUserStore();
 const post = usePostStore();
@@ -66,6 +65,7 @@ const submitPost = (async () => {
   });
   formInline.title = '';
   formInline.content = '';
+  postForm.value.clearValidate();
 })
 
 const submitClear = (() => {
@@ -78,7 +78,7 @@ const abs = (num) => {
 }
 </script>
 <template>
-  <div v-if="refresh.loading" class="aside">
+  <div v-if="refresh.loading" class="asidePlace">
     <!-- 佔位 -->
   </div>
   <div class="aside" v-if="!refresh.loading">
@@ -104,7 +104,9 @@ const abs = (num) => {
       </div>
       <div class="userInfo">
         <div class="userInfoContent">
-          <el-avatar :src="user.avatar_url" :size="64" :icon="UserFilled" class="userAvatar" />
+          <el-avatar :src="user.avatar_url" :size="64" class="userAvatar" >
+            <el-icon size="40"><UserFilled /></el-icon>
+          </el-avatar>
           <span>{{ user.username }}</span>
         </div>
         <el-col :span="20" class="userCounts">
@@ -155,11 +157,15 @@ const abs = (num) => {
 </template>
 
 <style lang="less" scoped>
+.asidePlace {
+  flex: 1;
+}
 .aside {
   flex: 1;
   display: flex;
   justify-content: center;
-  margin: 30px 0 0 50px;
+  padding: 30px 0 0 37px;
+  border-left: 1px solid var(--color-border);
   .asideContent {
     // position: fixed;
     display: flex;
@@ -174,6 +180,7 @@ const abs = (num) => {
       background-color: var(--color-card);
       border: 1px solid var(--color-border);
       border-radius: 4px;
+      transition: .3s;
 
       &:hover{
         box-shadow: var(--el-box-shadow-light);
@@ -197,7 +204,7 @@ const abs = (num) => {
     }
     .userInfo {
       width: 270px;
-      margin: 20px 0;
+      margin: 12px 0;
       padding: 20px 0;
       display: flex;
       flex-direction: column;
@@ -205,6 +212,10 @@ const abs = (num) => {
       border: 1px solid var(--color-border);
       border-radius: 4px;
       background-color: var(--color-card);
+      transition: .3s;
+      &:hover{
+        box-shadow: var(--el-box-shadow-light);
+      }
       .userInfoContent {
         display: flex;
         flex-direction: column;
@@ -226,43 +237,47 @@ const abs = (num) => {
       border: 1px solid var(--color-border);
       border-radius: 4px;
       background-color: var(--color-card);
-    }
-    .statisticCardBody {
-      display: flex;
-      justify-content: space-between;
-      width: 270px;
-      padding: 20px;
-      position: relative;
-      .newUserCount {
-        position: absolute;
-        top: 50px;
-        left: 67px;
-        span {
-          position: absolute;
-          top: -2px;
-          left: 18px;
-        }
-        .CaretTop {
-          color: var(--el-color-success);
-        }
-        .CaretBottom {
-          color: var(--el-color-danger);
-        }
+      transition: .3s;
+      &:hover{
+        box-shadow: var(--el-box-shadow-light);
       }
-      .newPostCount {
-        position: absolute;
-        top: 50px;
-        left: 193px;
-        span {
+      .statisticCardBody {
+        display: flex;
+        justify-content: space-between;
+        width: 270px;
+        padding: 20px;
+        position: relative;
+        .newUserCount {
           position: absolute;
-          top: -2px;
-          left: 18px;
+          top: 50px;
+          left: 67px;
+          span {
+            position: absolute;
+            top: -2px;
+            left: 18px;
+          }
+          .CaretTop {
+            color: var(--el-color-success);
+          }
+          .CaretBottom {
+            color: var(--el-color-danger);
+          }
         }
-        .CaretTop {
-          color: var(--el-color-success);
-        }
-        .CaretBottom {
-          color: var(--el-color-danger);
+        .newPostCount {
+          position: absolute;
+          top: 50px;
+          left: 193px;
+          span {
+            position: absolute;
+            top: -2px;
+            left: 18px;
+          }
+          .CaretTop {
+            color: var(--el-color-success);
+          }
+          .CaretBottom {
+            color: var(--el-color-danger);
+          }
         }
       }
     }
