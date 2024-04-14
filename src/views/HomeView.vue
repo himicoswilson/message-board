@@ -22,7 +22,7 @@ watch(
     <AppHeader />
     <div class="AppContainer" v-loading="refresh.loading">
       <AppCard :key="refresh.flag" />
-      <AppAside :key="refresh.flag"/>
+      <AppAside :key="refresh.flag" />
     </div>
   </div>
 </template>

@@ -6,7 +6,8 @@ export const useRefreshStore = defineStore({
     flag: 1,
     loading: true,
     cardsReady: false,
-    asideReady: false
+    asideReady: false,
+    pageLocation: false
   }),
   actions: {
     switchLoading(){
@@ -18,6 +19,7 @@ export const useRefreshStore = defineStore({
     refresh(){
       this.loading = !this.loading;
       this.flag += 1;
+      this.pageLocation = true;
     }
   },
 })

@@ -1,4 +1,5 @@
 <script setup>
+// 引入 Waterfall
 import { Waterfall } from 'vue-waterfall-plugin-next'
 import 'vue-waterfall-plugin-next/dist/style.css'
 // 引入 usePostStore
@@ -9,8 +10,12 @@ import { useUserStore } from '@/stores/userStore'
 import { useCountStore } from '@/stores/countStore'
 // 引入 useRefreshStore
 import { useRefreshStore } from '@/stores/refreshStore'
+// 引入 ref...
 import { ref, onMounted, reactive } from 'vue';
+// 引入 icon
 import { UserFilled } from "@element-plus/icons-vue";
+// 引入 formatDate
+import { formatDate } from '@/math/index.js'
 
 const post = usePostStore()
 const user = useUserStore()
@@ -38,29 +43,22 @@ const rules = reactive({
 })
 
 onMounted(async() => {
+  // if (refresh.pageLocation) {
+  //   postsPage.value = Number(localStorage.getItem('postsPage')) || 1;
+  // }
   await post.apiGetPosts(postsPage.value).then(() => {
     refresh.cardsReady = true;
+    localStorage.setItem('postsPage', postsPage.value);
   })
 })
 
 const loadingPost = (async() => {
   postsPage.value += 1;
-  await post.apiGetPosts(postsPage.value).catch(() => {
-    isLoading.value = false;
+  await post.apiGetPosts(postsPage.value).then(() => {
+    localStorage.setItem('postsPage', postsPage.value);
+  }).catch(() => {
+    isLoading.value = true;
   })
-})
-
-const formatDate = ((value) => {
-  if (!value) return '';
-  const date = new Date(value);
-  const year = date.getFullYear();
-  const month = (date.getMonth() + 1).toString().padStart(2, '0');
-  const day = date.getDate().toString().padStart(2, '0');
-  const hours = date.getHours().toString().padStart(2, '0');
-  const minutes = date.getMinutes().toString().padStart(2, '0');
-  
-  // 格式化日期為 'YYYY.MM.DD HH:mm'
-  return `${year}.${month}.${day} ${hours}:${minutes}`;
 })
 
 const editPost = ((id, title, content) => {
@@ -86,6 +84,19 @@ const editPostBtn = (async() => {
     dialogVisible.value = false;
     // 發請求獲取某個卡片 然後重新放到對象裡
     await post.apiGetEditPost(editPostForm.id)
+    // eslint-disable-next-line no-undef
+    ElNotification({
+      message: 'Edited successfully!',
+      type: 'success',
+      position: 'bottom-right',
+    })
+  }).catch(() => {
+    // eslint-disable-next-line no-undef
+    ElNotification({
+      message: 'Edited failed!',
+      type: 'error',
+      position: 'bottom-right',
+    })
   })
 })
 
@@ -129,8 +140,7 @@ const apiGetCountInfo = (async() => {
     v-if="!refresh.loading"
     :hasAroundGutter="false"
     :gutter="12"
-    :animationDuration="1000"
-    :animationDelay="0"
+    :animationDuration="300"
     v-infinite-scroll="loadingPost" 
     :infinite-scroll-disabled="isLoading"
   >
@@ -140,11 +150,22 @@ const apiGetCountInfo = (async() => {
           <div class="postArea">
             <div class="postInfo">
               <span class="title">{{ item.title }}</span>
-              <span class="time">{{ formatDate(item.created_at) }}</span>
             </div>
             <div class="postOperate">
+              <!-- 歷史記錄 -->
+              <div class="backBtn">
+                <el-popover popper-class="backContent" placement="bottom" trigger="click" hide-after="0">
+                  <p>There is no more content</p>
+                  <div style="text-align: right; margin: 0">
+                    
+                  </div>
+                  <template #reference>
+                    <el-icon><List /></el-icon>
+                  </template>
+                </el-popover>
+              </div>
               <!-- 操作按鈕 -->
-              <el-dropdown size="small" trigger="click" v-show="item.username === user.username">
+              <el-dropdown size="small" trigger="click" class="moreBtn" v-show="item.username === user.username">
                 <font-awesome-icon :icon="['fas', 'ellipsis']" />
                 <template #dropdown>
                   <el-dropdown-menu>
@@ -161,6 +182,7 @@ const apiGetCountInfo = (async() => {
               </el-dropdown>
             </div>
           </div>
+          <span class="time">{{ formatDate(item.created_at) }}</span>
           <div class="postContent">
             <p>{{ item.content }}</p>
           </div>
@@ -220,19 +242,30 @@ const apiGetCountInfo = (async() => {
       flex-direction: column;
       .postArea {
         display: flex;
-        align-items: baseline;
         justify-content: space-between;
         .postInfo {
+          padding-right: 10px;
           .title {
             font-size: 20px;
             font-weight: 600;
           }
-          .time {
+        }
+        .postOperate {
+          display: flex;
+          margin-top: 8.5px;
+          .backBtn {
+            display: flex;
+            color: var(--el-text-color-regular);
+            margin-top: -0.5px;
+          }
+          .moreBtn {
             margin-left: 10px;
-            font-size: 12px;
-            color: var(--color-time);
           }
         }
+      }
+      .time {
+        font-size: 12px;
+        color: var(--color-time);
       }
       .postContent {
         display: flex;
@@ -257,5 +290,7 @@ const apiGetCountInfo = (async() => {
 .operateLabel{
   margin-left: 5px;
 }
+.backContent {
+  width: 1000px;
+}
 </style>
-

@@ -32,11 +32,15 @@ a,
   --el-input-border-color: var(--color-border) !important;
   --el-input-hover-border-color: var(--color-border-hover) !important;
   --el-input-border-radius: 6px !important;
+  --el-input-text-color: var(--color-text) !important;
+  --el-input-placeholder-color: var(--el-text-color-regular) !important;
 }
 .el-textarea {
   --el-input-bg-color: var(--color-input) !important;
   --el-input-border-color: var(--color-border) !important;
   --el-input-hover-border-color: var(--color-border-hover) !important;
+  --el-input-text-color: var(--color-text) !important;
+  --el-input-placeholder-color: var(--el-text-color-regular) !important;
 }
 /* 通知 */
 .el-notification {
@@ -51,4 +55,11 @@ a,
 /* 統計數字 */
 .el-statistic__content {
   color: var(--color-text) !important;
+}
+/* 對話框 */
+.el-dialog {
+  --el-dialog-bg-color: var(--color-background) !important;
+  .el-dialog__title {
+    color: var(--color-text) !important;
+  }
 }
