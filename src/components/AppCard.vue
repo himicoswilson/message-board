@@ -25,12 +25,25 @@ const refresh = useRefreshStore()
 const postsPage = ref(1);
 const isLoading = ref(false);
 const dialogVisible = ref(false);
+const historyDialogVisible = ref(false);
 const postEditForm = ref();
 
 const editPostForm = reactive({
   id: '',
   title: '',
   content: '',
+});
+
+const historyData = reactive({
+  title: '',
+  content: '',
+});
+
+const popperStyle = reactive({
+  width: 'auto',
+  display: 'flex',
+  justifyContent: 'center',
+  padding: '0px'
 });
 
 const rules = reactive({
@@ -121,6 +134,27 @@ const deletePost = (async(id) => {
   })
 })
 
+const getBackup = (id) => {
+  post.editObj = {
+    id: '',
+    post_id: '',
+    username: '',
+    avatar_url: '',
+    title: '',
+    content: '',
+    edited_at: '',
+    deleted_at: ''
+  }
+  post.apiGetHistoryPost(id)
+}
+
+const showHistory = (title, content) => {
+  historyData.title = title;
+  historyData.content = content;
+  historyDialogVisible.value = true;
+}
+
+
 const apiGetCountInfo = (async() => {
   await count.apiGetPostCount();
   await count.apiGetUserPostCount();
@@ -151,13 +185,37 @@ const apiGetCountInfo = (async() => {
             <div class="postInfo">
               <span class="title">{{ item.title }}</span>
             </div>
-            <div class="postOperate">
+            <div class="postOperate"> 
               <!-- 歷史記錄 -->
-              <div class="backBtn">
-                <el-popover popper-class="backContent" placement="bottom" trigger="click" hide-after="0">
-                  <p>There is no more content</p>
-                  <div style="text-align: right; margin: 0">
-                    
+              <div class="backBtn" @click="getBackup(item.id)">
+                <el-popover :popper-style="popperStyle" placement="bottom" trigger="click" hide-after="0">
+                  <div>
+                    <div class="backupTitle">Edited {{ post.editObj.length || 0 }} time</div>
+                      <!-- 最新的一條 -->
+                      <div 
+                        class="nowList" 
+                        @click="showHistory(item.title, item.content)"
+                      >
+                        <el-avatar :src="item.avatar_url" :size="22"  class="userAvatar" >
+                          <el-icon size="14"><UserFilled /></el-icon>
+                        </el-avatar>
+                        <span class="username">{{ item.username }}</span>
+                        <span class="date">{{ post.editObj.length ? 'edited on' : 'created on' }} {{ formatDate(item.updated_at || item.created_at) }}</span>
+                      </div>
+                      <!-- 之前所有修改過的 -->
+                      <div 
+                        class="backupList" 
+                        v-show="post.editObj.length > 0" 
+                        @click="showHistory(edit.title, edit.content)" v-for="(edit, index) in post.editObj" 
+                        :key="edit.id"
+                      >
+                        <el-avatar :src="edit.avatar_url" :size="22"  class="userAvatar" >
+                          <el-icon size="14"><UserFilled /></el-icon>
+                        </el-avatar>
+                        <span class="username">{{ edit.username }}</span>
+                        <span class="date">{{ post.editObj.length === 1 ? 'created on' : (index ? 'created on' : 'edited on') }} {{ formatDate(edit.edited_at) }}</span>
+                      </div>
+                      
                   </div>
                   <template #reference>
                     <el-icon><List /></el-icon>
@@ -182,7 +240,7 @@ const apiGetCountInfo = (async() => {
               </el-dropdown>
             </div>
           </div>
-          <span class="time">{{ formatDate(item.created_at) }}</span>
+          <span class="time">{{ item.updated_at != null ? "edited at " + formatDate(item.updated_at) : formatDate(item.created_at) }}</span>
           <div class="postContent">
             <p>{{ item.content }}</p>
           </div>
@@ -218,6 +276,14 @@ const apiGetCountInfo = (async() => {
         <el-button type="primary" @click="editPostBtn">Confirm</el-button>
       </div>
     </template>
+  </el-dialog>
+  <el-dialog v-model="historyDialogVisible" title="Post History" width="500">
+    <div>
+      <div>Title: </div>
+      <div class="historyDialogTitle">{{ historyData.title }}</div>
+      <div>Content: </div>
+      <div class="historyDialogContent">{{ historyData.content }}</div>
+    </div>
   </el-dialog>
 </template>
 
@@ -290,7 +356,25 @@ const apiGetCountInfo = (async() => {
 .operateLabel{
   margin-left: 5px;
 }
-.backContent {
-  width: 1000px;
+.backupTitle {
+  margin-top: 12px;
+  margin-bottom: 10px;
+  padding: 0 20px;
+}
+.backupList, .nowList {
+  display: flex;
+  align-items: center;
+  border-top: 1px solid var(--color-border);
+  padding: 10px 20px;
+  &:hover{
+    cursor: pointer;
+  }
+  .userAvatar {
+    margin-right: 5px;
+  }
+  .username {
+    margin-right: 5px;
+    font-weight: 600;
+  }
 }
 </style>

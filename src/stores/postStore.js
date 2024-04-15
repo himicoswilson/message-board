@@ -11,8 +11,19 @@ export const usePostStore = defineStore({
       avatar_url: '',
       title: '',
       content: '',
-      created_at: ''
+      created_at: '',
+      updated_at: ''
     }],
+    editObj: {
+      id: '',
+      post_id: '',
+      username: '',
+      avatar_url: '',
+      title: '',
+      content: '',
+      edited_at: '',
+      deleted_at: ''
+    }
   }),
 
   actions: {
@@ -70,5 +81,11 @@ export const usePostStore = defineStore({
         user_token: user_token
       })
     },
+    // apiGetHistoryPost
+    async apiGetHistoryPost(id){
+      const response = await axios.get(`/gethistorypost/${id}`)
+      this.editObj = response.data
+      // this.editObj.unshift(this.postObj.find(post => post.id == id))
+    }
   },
 })
