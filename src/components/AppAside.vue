@@ -104,9 +104,18 @@ const abs = (num) => {
       </div>
       <div class="userInfo">
         <div class="userInfoContent">
-          <el-avatar :src="user.avatar_url" :size="64" class="userAvatar" >
-            <el-icon size="40"><UserFilled /></el-icon>
-          </el-avatar>
+          <el-upload
+            class="avatarUploader"
+            action="http://47.100.101.113:3000/uploadavatar"
+            :show-file-list="false"
+            :data="{ id: user.id }"
+          >
+            <el-icon class="avatarUploaderIcon"><Plus /></el-icon>
+            <div class="userAvatarMask"></div>
+            <el-avatar :src="user.avatar_url" :size="64" class="userAvatar" >
+              <el-icon size="40"><UserFilled /></el-icon>
+            </el-avatar>
+          </el-upload>
           <span>{{ user.username }}</span>
         </div>
         <el-col :span="20" class="userCounts">
@@ -219,6 +228,34 @@ const abs = (num) => {
         display: flex;
         flex-direction: column;
         align-items: center;
+        .avatarUploaderIcon {
+          display: none;
+          position: absolute;
+          font-size: 30px;
+          color: #b5b0b0;
+          z-index: 2;
+        }
+        .userAvatarMask {
+          width: 64px;
+          height: 64px;
+          position: absolute;
+          margin-top: -10px;
+          border-radius: 50%;
+          background-color: rgba(0, 0, 0, 0.5); /* 使用半透明黑色作为遮罩颜色，可自定义 */
+          opacity: 0; /* 初始状态时隐藏遮罩 */
+          transition: opacity 0.3s ease-in-out; /* 添加过渡效果，使遮罩显示与隐藏更平滑 */
+          z-index: 1; /* 确保遮罩层位于 `.userAvatar` 内部内容之上 */
+        }
+        .avatarUploader {
+          &:hover {
+            .avatarUploaderIcon {
+              display: block;
+            }
+            .userAvatarMask {
+              opacity: 1;
+            }
+          }
+        }
         .userAvatar {
           margin-bottom: 10px;
         }
