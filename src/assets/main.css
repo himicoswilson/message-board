@@ -63,3 +63,17 @@ a,
     color: var(--color-text) !important;
   }
 }
+.historyDialog {
+  padding: 0 !important;
+  header {
+    padding-bottom: 0 !important;
+  }
+  button.el-dialog__headerbtn {
+    display: flex;
+    align-items: center;
+  }
+}
+/* popover */
+.el-popover.el-popper {
+  color: var(--color-text) !important;
+}

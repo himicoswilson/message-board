@@ -16,6 +16,8 @@ import { ref, onMounted, reactive } from 'vue';
 import { UserFilled } from "@element-plus/icons-vue";
 // 引入 formatDate
 import { formatDate } from '@/math/index.js'
+// 引入 debounce
+import { debounce } from 'lodash';
 
 const post = usePostStore()
 const user = useUserStore()
@@ -35,15 +37,20 @@ const editPostForm = reactive({
 });
 
 const historyData = reactive({
+  avatar_url: '',
+  username: '',
+  date: '',
   title: '',
   content: '',
+  createdOrEdited: '',
 });
 
 const popperStyle = reactive({
   width: 'auto',
   display: 'flex',
   justifyContent: 'center',
-  padding: '0px'
+  padding: '0px',
+  zIndex: '1'
 });
 
 const rules = reactive({
@@ -134,7 +141,7 @@ const deletePost = (async(id) => {
   })
 })
 
-const getBackup = (id) => {
+const debouncedGetBackup = debounce((id) => {
   post.editObj = {
     id: '',
     post_id: '',
@@ -144,13 +151,17 @@ const getBackup = (id) => {
     content: '',
     edited_at: '',
     deleted_at: ''
-  }
-  post.apiGetHistoryPost(id)
-}
+  };
+  post.apiGetHistoryPost(id);
+}, 500, { leading: true });
 
-const showHistory = (title, content) => {
+const showHistory = (avatar_url, username, date, title, content, createdOrEdited) => {
+  historyData.avatar_url = avatar_url;
+  historyData.username = username;
+  historyData.date = date;
   historyData.title = title;
   historyData.content = content;
+  historyData.createdOrEdited = createdOrEdited;
   historyDialogVisible.value = true;
 }
 
@@ -187,14 +198,20 @@ const apiGetCountInfo = (async() => {
             </div>
             <div class="postOperate"> 
               <!-- 歷史記錄 -->
-              <div class="backBtn" @click="getBackup(item.id)">
-                <el-popover :popper-style="popperStyle" placement="bottom" trigger="click" hide-after="0">
+              <div class="backBtn" >
+                <el-popover
+                  :popper-style="popperStyle"
+                  placement="bottom" 
+                  trigger="click"
+                  hide-after="0"
+                  @before-enter="debouncedGetBackup(item.id)"
+                >
                   <div>
                     <div class="backupTitle">Edited {{ post.editObj.length || 0 }} time</div>
                       <!-- 最新的一條 -->
                       <div 
                         class="nowList" 
-                        @click="showHistory(item.title, item.content)"
+                        @click="showHistory(item.avatar_url, item.username, item.updated_at || item.created_at, item.title, item.content, post.editObj.length ? 'edited on' : 'created on')"
                       >
                         <el-avatar :src="item.avatar_url" :size="22"  class="userAvatar" >
                           <el-icon size="14"><UserFilled /></el-icon>
@@ -206,7 +223,8 @@ const apiGetCountInfo = (async() => {
                       <div 
                         class="backupList" 
                         v-show="post.editObj.length > 0" 
-                        @click="showHistory(edit.title, edit.content)" v-for="(edit, index) in post.editObj" 
+                        @click="showHistory(edit.avatar_url, edit.username, edit.edited_at, edit.title, edit.content, post.editObj.length === 1 ? 'created on' : (index ? 'created on' : 'edited on'))"
+                        v-for="(edit, index) in post.editObj" 
                         :key="edit.id"
                       >
                         <el-avatar :src="edit.avatar_url" :size="22"  class="userAvatar" >
@@ -277,12 +295,19 @@ const apiGetCountInfo = (async() => {
       </div>
     </template>
   </el-dialog>
-  <el-dialog v-model="historyDialogVisible" title="Post History" width="500">
-    <div>
-      <div>Title: </div>
-      <div class="historyDialogTitle">{{ historyData.title }}</div>
-      <div>Content: </div>
-      <div class="historyDialogContent">{{ historyData.content }}</div>
+  <el-dialog v-model="historyDialogVisible"  width="500" class="historyDialog">
+    <div class="historyDialogBody">
+      <div class="historyDialogHeader">
+        <el-avatar :src="historyData.avatar_url" :size="22"  class="userAvatar" >
+          <el-icon size="14"><UserFilled /></el-icon>
+        </el-avatar>
+        <span class="username">{{ historyData.username }}</span>
+        <span class="date">{{ historyData.createdOrEdited }} {{ formatDate(historyData.date) }}</span>
+      </div>
+      <div class="historyDialogContent">
+        <div class="title"><span>{{ historyData.title }}</span></div>
+        <div class="content"><span>{{ historyData.content }}</span></div>
+      </div>
     </div>
   </el-dialog>
 </template>
@@ -297,7 +322,7 @@ const apiGetCountInfo = (async() => {
   background-color: #00000000;
   min-height: 757px;
   margin: 30px 0;
-  padding-right: 38px;
+  padding-right: 30px;
 
   .card {
     color: var(--color-text);
@@ -360,6 +385,7 @@ const apiGetCountInfo = (async() => {
   margin-top: 12px;
   margin-bottom: 10px;
   padding: 0 20px;
+  font-weight: 600;
 }
 .backupList, .nowList {
   display: flex;
@@ -377,4 +403,40 @@ const apiGetCountInfo = (async() => {
     font-weight: 600;
   }
 }
+.historyDialogBody {
+  color: var(--color-text);
+  .historyDialogHeader {
+    display: flex;
+    align-items: center;
+    padding: 16px;
+    padding-bottom: 15px;
+    .userAvatar {
+      margin-right: 5px;
+    }
+    .username {
+      margin-right: 5px;
+      font-weight: 600;
+    }
+  }
+  .historyDialogContent {
+    border-top: 1px solid var(--color-border);
+    padding: 16px;
+    .title {
+      box-shadow: inset 4px 0 0 #4ac26b66;
+      span {
+        font-size: 18px;
+        font-weight: 600;
+        margin-left: 10px;
+      }
+    }
+    .content {
+      box-shadow: inset 4px 0 0 #4ac26b66;
+      margin-top: 15px;
+      span {
+        margin-left: 10px;
+      }
+    }
+  }
+}
+
 </style>

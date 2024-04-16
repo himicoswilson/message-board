@@ -161,10 +161,9 @@ const abs = (num) => {
   flex: 1;
 }
 .aside {
-  flex: 1;
   display: flex;
   justify-content: center;
-  padding: 30px 0 0 37px;
+  padding: 30px 0 0 28px;
   border-left: 1px solid var(--color-border);
   .asideContent {
     // position: fixed;
