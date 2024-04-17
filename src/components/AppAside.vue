@@ -29,14 +29,14 @@ const rules = reactive({
   ],
 })
 
-onMounted(async() => {
+onMounted(async () => {
   await count.apiGetUserCount()
   await apiGetCountInfo().then(() => {
     refresh.asideReady = true;
   })
 })
 
-const apiGetCountInfo = (async() => {
+const apiGetCountInfo = (async () => {
   await count.apiGetPostCount();
   await count.apiGetUserPostCount();
   await count.apiGetUserCountCompare();
@@ -73,8 +73,33 @@ const submitClear = (() => {
   formInline.content = '';
 })
 
-const abs = (num) => {
-  return Math.abs(num);
+const handleAvatarSuccess = (async (res) => {
+  // eslint-disable-next-line no-undef
+  ElNotification({
+    message: `${res}`,
+    type: 'success',
+    position: 'bottom-right',
+  })
+  await user.apiGetInfo()
+  // 去post.postObj裡尋找與user.username 相同的對象，改變對象裡的avatar_url為user.avatar_url
+  post.postObj.forEach((element) => {
+    if (element.username === user.username) {
+      element.avatar_url = user.avatar_url;
+    }
+  })
+})
+
+const beforeAvatarUpload = (rawFile) => {
+  if (rawFile.type !== 'image/jpeg' && rawFile.type !== 'image/png') {
+    // eslint-disable-next-line no-undef
+    ElMessage.error('Avatar picture must be JPG/PNG format!')
+    return false
+  } else if (rawFile.size / 1024 / 1024 > 2) {
+    // eslint-disable-next-line no-undef
+    ElMessage.error('Avatar picture size can not exceed 2MB!')
+    return false
+  }
+  return true
 }
 </script>
 <template>
@@ -109,6 +134,8 @@ const abs = (num) => {
             action="http://47.100.101.113:3000/uploadavatar"
             :show-file-list="false"
             :data="{ id: user.id }"
+            :on-success="handleAvatarSuccess"
+            :before-upload="beforeAvatarUpload"
           >
             <el-icon class="avatarUploaderIcon"><Plus /></el-icon>
             <div class="userAvatarMask"></div>
@@ -132,13 +159,13 @@ const abs = (num) => {
                 <el-icon >
                   <CaretTop />
                 </el-icon>
-                <span>{{ abs(count.compareUserCount)  }}</span>
+                <span>{{ Math.abs(count.compareUserCount)  }}</span>
               </div>
               <div class="CaretBottom" v-else-if="count.compareUserCount < 0">
                 <el-icon >
                   <CaretBottom />
                 </el-icon>
-                <span>{{ abs(count.compareUserCount)  }}</span>
+                <span>{{ Math.abs(count.compareUserCount)  }}</span>
               </div>
             </div>
           </div>
@@ -149,13 +176,13 @@ const abs = (num) => {
                 <el-icon >
                   <CaretTop />
                 </el-icon>
-                <span>{{ abs(count.comparePostCount)  }}</span>
+                <span>{{ Math.abs(count.comparePostCount)  }}</span>
               </div>
               <div class="CaretBottom" v-else-if="count.comparePostCount < 0">
                 <el-icon >
                   <CaretBottom />
                 </el-icon>
-                <span>{{ abs(count.comparePostCount)  }}</span>
+                <span>{{ Math.abs(count.comparePostCount)  }}</span>
               </div>
             </div>
           </div>
