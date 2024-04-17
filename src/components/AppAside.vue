@@ -46,7 +46,7 @@ const apiGetCountInfo = (async () => {
 const submitPost = (async () => {
   await postForm.value.validate();
   await post.apiPostMsg(formInline.title, formInline.content).then(() => {
-    post.apiGetPost();
+    post.apiGetNewPost();
     apiGetCountInfo();
     // eslint-disable-next-line no-undef
     ElNotification({

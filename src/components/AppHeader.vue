@@ -34,6 +34,7 @@ onMounted(() => {
 
 const goHome = (() => {
   router.push('/')
+  refresh.loading = true;
 })
 
 const refreshBtn = (() => {

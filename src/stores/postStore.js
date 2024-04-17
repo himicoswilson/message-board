@@ -5,6 +5,15 @@ import axios from 'axios';
 export const usePostStore = defineStore({
   id: 'post',
   state: () => ({
+    post: {
+      id: '',
+      username: '',
+      avatar_url: '',
+      title: '',
+      content: '',
+      created_at: '',
+      updated_at: ''
+    },
     postObj: [{
       id: '',
       username: '',
@@ -27,6 +36,11 @@ export const usePostStore = defineStore({
   }),
 
   actions: {
+    // apiGetPost
+    async apiGetPost(id){
+      const response = await axios.get(`/getpost/${id}`)
+      this.post = response.data
+    },
     // apiGetPosts
     async apiGetPosts(page){
       const response = await axios.get(`/getposts/${page}`)
@@ -37,8 +51,8 @@ export const usePostStore = defineStore({
       }
     },
     // apiGetPost
-    async apiGetPost(){
-      const response = await axios.get(`/getpost`)
+    async apiGetNewPost(){
+      const response = await axios.get(`/getnewpost`)
       const newPosts = response.data
       this.postObj.unshift(newPosts);
     },

@@ -18,11 +18,15 @@ import { UserFilled } from "@element-plus/icons-vue";
 import { formatDate } from '@/math/index.js'
 // 引入 debounce
 import { debounce } from 'lodash';
+// 引入 router
+import { useRouter } from 'vue-router';
 
 const post = usePostStore()
 const user = useUserStore()
 const count = useCountStore();
 const refresh = useRefreshStore()
+
+const router = useRouter();
 
 const postsPage = ref(1);
 const isLoading = ref(false);
@@ -165,12 +169,15 @@ const showHistory = (avatar_url, username, date, title, content, createdOrEdited
   historyDialogVisible.value = true;
 }
 
-
 const apiGetCountInfo = (async() => {
   await count.apiGetPostCount();
   await count.apiGetUserPostCount();
   await count.apiGetUserCountCompare();
   await count.apiGetPostCountCompare();
+})
+
+const routerPostInfo = ((id) => {
+  router.push({ path: `/posts/${id}` });
 })
 </script>
 
@@ -258,7 +265,9 @@ const apiGetCountInfo = (async() => {
               </el-dropdown>
             </div>
           </div>
-          <span class="time">{{ item.updated_at != null ? "edited at " + formatDate(item.updated_at) : formatDate(item.created_at) }}</span>
+          <div class="time">
+            <span>{{ item.updated_at != null ? "edited at " + formatDate(item.updated_at) : formatDate(item.created_at) }}</span>
+          </div>
           <div class="postContent">
             <p>{{ item.content }}</p>
           </div>
@@ -267,6 +276,8 @@ const apiGetCountInfo = (async() => {
               <el-icon size="14"><UserFilled /></el-icon>
             </el-avatar>
             <span class="username">{{ item.username }}</span>
+          </div>
+          <div class="cardBg" @click="routerPostInfo(item.id)">
           </div>
         </div>
       </el-card>
@@ -323,7 +334,6 @@ const apiGetCountInfo = (async() => {
   min-height: 757px;
   margin: 30px 0;
   padding-right: 30px;
-
   .card {
     color: var(--color-text);
     background-color: var(--color-card);
@@ -339,30 +349,46 @@ const apiGetCountInfo = (async() => {
           .title {
             font-size: 20px;
             font-weight: 600;
+            position: relative;
+            z-index: 1;
           }
         }
         .postOperate {
           display: flex;
           margin-top: 8.5px;
+          position: relative;
+          z-index: 1;
           .backBtn {
             display: flex;
             color: var(--el-text-color-regular);
             margin-top: -0.5px;
+            &:hover {
+              cursor: pointer;
+            }
           }
           .moreBtn {
             margin-left: 10px;
+            &:hover {
+              cursor: pointer;
+            }
           }
         }
       }
       .time {
         font-size: 12px;
         color: var(--color-time);
+        span {
+          position: relative;
+          z-index: 1;
+        }
       }
       .postContent {
         display: flex;
         p {
           margin-top: 10px;
           font-size: 14px;
+          position: relative;
+          z-index: 1;
         }
       }
       .userData {
@@ -373,6 +399,22 @@ const apiGetCountInfo = (async() => {
         
         .userAvatar {
           margin-right: 5px; 
+          position: relative;
+          z-index: 1;
+        }
+        .username {
+          position: relative;
+          z-index: 1;
+        }
+      }
+      .cardBg {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        top: 0;
+        left: 0;
+        &:hover {
+          cursor: pointer;
         }
       }
     }

@@ -11,7 +11,7 @@ export const useRefreshStore = defineStore({
   }),
   actions: {
     switchLoading(){
-      this.loading = !this.loading;
+      this.loading = false;
       this.cardsReady = false;
       this.asideReady = false;
     },
