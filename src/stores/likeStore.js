@@ -6,6 +6,7 @@ export const useLikeStore = defineStore({
   id: 'like',
   state: () => ({
     likePosts: [],
+    likePostNumObj: [],
   }),
 
   actions: {
@@ -23,6 +24,19 @@ export const useLikeStore = defineStore({
       })
       // 把response.data裡面的post_id全部存進likePost，以數組的方式
       this.likePosts = response.data.map(item => item.post_id);
+    },
+    // apiGetEveryPostLikeNum
+    async apiGetPostsLikeNum() {
+      await axios.post('/getpostslikenum')
+    },
+    // apiGetPostLikeNum
+    async apiGetPostLikeNum(postId) {
+      const response = await axios.post('/getpostlikenum', {
+        postId,
+      })
+      // 把response.data裡面的post_id全部存進likePost，以數組的方式
+      this.likePostNumObj = response.data;
+      console.log(this.likePostNumObj);
     },
   },
 })

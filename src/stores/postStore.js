@@ -22,6 +22,8 @@ export const usePostStore = defineStore({
       content: '',
       created_at: '',
       updated_at: '',
+      isLike: false,
+      likes: ''
     }],
     editObj: {
       id: '',
@@ -100,6 +102,6 @@ export const usePostStore = defineStore({
       const response = await axios.get(`/gethistorypost/${id}`)
       this.editObj = response.data
       // this.editObj.unshift(this.postObj.find(post => post.id == id))
-    }
+    },
   },
 })

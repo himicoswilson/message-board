@@ -77,13 +77,8 @@ onMounted(async() => {
     refresh.cardsReady = true;
     localStorage.setItem('postsPage', postsPage.value);
   })
-  await like.apiGetLikePost(user.token).then(() => {
-    post.postObj.forEach(post => {
-      if (like.likePosts.includes(post.id)) {
-        post.isLike = true
-      }
-    })
-  })
+  getLikePost();
+  getPostsLikeNum();
 })
 
 const loadingPost = (async() => {
@@ -93,6 +88,8 @@ const loadingPost = (async() => {
   }).catch(() => {
     isLoading.value = true;
   })
+  getLikePost();
+  getPostsLikeNum();
 })
 
 const editPost = ((id, title, content) => {
@@ -190,7 +187,8 @@ const routerPostInfo = ((id) => {
   router.push({ path: `/posts/${id}` });
 })
 
-const likePost = (async (userToken, postId) => {
+// 點擊讚按鈕的回調
+const likePost = (async (userToken, postId, index) => {
   await like.apiLikePost(userToken, postId).then(() => {
     post.postObj.forEach(post => {
       if (post.id === postId) {
@@ -198,6 +196,23 @@ const likePost = (async (userToken, postId) => {
       }
     })
   })
+  await getPostsLikeNum();
+  await like.apiGetPostLikeNum(postId)
+  post.postObj[index].likes = like.likePostNumObj.likes
+})
+
+const getLikePost = (async() => {
+  await like.apiGetLikePost(user.token).then(() => {
+    post.postObj.forEach(post => {
+      if (like.likePosts.includes(post.id)) {
+        post.isLike = true
+      }
+    })
+  })
+})
+
+const getPostsLikeNum = (async() => {
+  await like.apiGetPostsLikeNum();
 })
 </script>
 
@@ -216,7 +231,7 @@ const likePost = (async (userToken, postId) => {
     v-infinite-scroll="loadingPost" 
     :infinite-scroll-disabled="isLoading"
   >
-    <template #item="{ item }">
+    <template #item="{ item, index }">
       <el-card :key="postData" class="card" shadow="hover" >
         <div class="cardBody">
           <div class="postArea">
@@ -293,7 +308,8 @@ const likePost = (async (userToken, postId) => {
           </div>
           <div class="cardFooter">
             <div class="cardLike">
-              <font-awesome-icon @click="likePost(user.token, item.id)" :icon="[`${item.isLike ?'fas' :'far'}`, 'thumbs-up']" />
+              <font-awesome-icon @click="likePost(user.token, item.id, index)" :icon="[`${item.isLike ?'fas' :'far'}`, 'thumbs-up']" />
+              <span class="likeNum">{{ item.likes }}</span>
             </div>
             <div class="userData">
               <el-avatar :src="item.avatar_url" :size="22"  class="userAvatar" >
@@ -429,6 +445,11 @@ const likePost = (async (userToken, postId) => {
           &:hover {
             cursor: pointer;
           }
+          .likeNum {
+            position: relative;
+            top: 5px;
+            left: 7px;
+          }
         }
         .userData {
           display: flex;
@@ -444,6 +465,7 @@ const likePost = (async (userToken, postId) => {
           .username {
             position: relative;
             z-index: 1;
+            font-weight: 600;
           }
         }
       }
