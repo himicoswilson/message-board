@@ -16,7 +16,8 @@ import {library} from '@fortawesome/fontawesome-svg-core'
 import {FontAwesomeIcon} from '@fortawesome/vue-fontawesome'
 
 /* import specific icons */
-import {faRightFromBracket, faTrash, faEllipsis, faPenToSquare} from '@fortawesome/free-solid-svg-icons'
+import { faThumbsUp as farThumbsUp } from '@fortawesome/free-regular-svg-icons'
+import {faRightFromBracket, faTrash, faEllipsis, faPenToSquare, faThumbsUp} from '@fortawesome/free-solid-svg-icons'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 
 // import every components
@@ -34,7 +35,7 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
 axios.defaults.baseURL = 'http://47.100.101.113:3000'
 
 /* add icons to the library */
-library.add(faRightFromBracket, faTrash, faEllipsis, faPenToSquare)
+library.add(faRightFromBracket, faTrash, faEllipsis, faPenToSquare, faThumbsUp, farThumbsUp)
 
 /* 注册 font awesome icon 全局组件 */
 app.component('font-awesome-icon', FontAwesomeIcon)

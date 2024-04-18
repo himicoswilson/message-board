@@ -10,6 +10,8 @@ import { useUserStore } from '@/stores/userStore'
 import { useCountStore } from '@/stores/countStore'
 // 引入 useRefreshStore
 import { useRefreshStore } from '@/stores/refreshStore'
+// 引入 useLikeStore
+import { useLikeStore } from '@/stores/likeStore'
 // 引入 ref...
 import { ref, onMounted, reactive } from 'vue';
 // 引入 icon
@@ -25,6 +27,7 @@ const post = usePostStore()
 const user = useUserStore()
 const count = useCountStore();
 const refresh = useRefreshStore()
+const like = useLikeStore()
 
 const router = useRouter();
 
@@ -73,6 +76,13 @@ onMounted(async() => {
   await post.apiGetPosts(postsPage.value).then(() => {
     refresh.cardsReady = true;
     localStorage.setItem('postsPage', postsPage.value);
+  })
+  await like.apiGetLikePost(user.token).then(() => {
+    post.postObj.forEach(post => {
+      if (like.likePosts.includes(post.id)) {
+        post.isLike = true
+      }
+    })
   })
 })
 
@@ -179,6 +189,16 @@ const apiGetCountInfo = (async() => {
 const routerPostInfo = ((id) => {
   router.push({ path: `/posts/${id}` });
 })
+
+const likePost = (async (userToken, postId) => {
+  await like.apiLikePost(userToken, postId).then(() => {
+    post.postObj.forEach(post => {
+      if (post.id === postId) {
+        post.isLike = !post.isLike
+      }
+    })
+  })
+})
 </script>
 
 <template>
@@ -271,12 +291,18 @@ const routerPostInfo = ((id) => {
           <div class="postContent">
             <p>{{ item.content }}</p>
           </div>
-          <div class="userData">
-            <el-avatar :src="item.avatar_url" :size="22"  class="userAvatar" >
-              <el-icon size="14"><UserFilled /></el-icon>
-            </el-avatar>
-            <span class="username">{{ item.username }}</span>
+          <div class="cardFooter">
+            <div class="cardLike">
+              <font-awesome-icon @click="likePost(user.token, item.id)" :icon="[`${item.isLike ?'fas' :'far'}`, 'thumbs-up']" />
+            </div>
+            <div class="userData">
+              <el-avatar :src="item.avatar_url" :size="22"  class="userAvatar" >
+                <el-icon size="14"><UserFilled /></el-icon>
+              </el-avatar>
+              <span class="username">{{ item.username }}</span>
+            </div>
           </div>
+          
           <div class="cardBg" @click="routerPostInfo(item.id)">
           </div>
         </div>
@@ -391,20 +417,34 @@ const routerPostInfo = ((id) => {
           z-index: 1;
         }
       }
-      .userData {
+      .cardFooter {
         display: flex;
-        align-items: center;
-        margin-top: 20px;
-        justify-content: flex-end;
-        
-        .userAvatar {
-          margin-right: 5px; 
-          position: relative;
+        justify-content: space-between;
+        .cardLike {
+          display: flex;
+          align-items: flex-end;
+          margin-bottom: 6px;
+          margin-left: 1px;
           z-index: 1;
+          &:hover {
+            cursor: pointer;
+          }
         }
-        .username {
-          position: relative;
-          z-index: 1;
+        .userData {
+          display: flex;
+          align-items: center;
+          margin-top: 20px;
+          justify-content: flex-end;
+          
+          .userAvatar {
+            margin-right: 5px; 
+            position: relative;
+            z-index: 1;
+          }
+          .username {
+            position: relative;
+            z-index: 1;
+          }
         }
       }
       .cardBg {

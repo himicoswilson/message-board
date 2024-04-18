@@ -7,6 +7,7 @@ export const useUserStore = defineStore({
     id: 0,
     username: '',
     avatar_url: '',
+    token: '',
     logoffUser: {
       username: '',
       password: '',
@@ -20,6 +21,7 @@ export const useUserStore = defineStore({
     async apiGetInfo(){
       // 從 localStorage 中取出 token
       const token = localStorage.getItem('token');
+      this.token = token;
       await axios.post('/user', {
         token: token
       }).then( value => {
