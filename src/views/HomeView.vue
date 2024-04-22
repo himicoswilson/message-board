@@ -21,8 +21,8 @@ watch(
   <div class="App">
     <AppHeader />
     <div class="AppContainer" v-loading="refresh.loading">
-      <AppCard :key="refresh.flag" />
-      <AppAside :key="refresh.flag" />
+      <HomeCards :key="refresh.flag" />
+      <HomeAside :key="refresh.flag" />
     </div>
   </div>
 </template>

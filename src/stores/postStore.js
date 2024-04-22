@@ -75,9 +75,9 @@ export const usePostStore = defineStore({
       // 從 localStorage 中取出 token
       const user_token = localStorage.getItem('token');
       await axios.post('/post', {
-        title: title,
-        content: content,
-        user_token: user_token
+        title,
+        content,
+        user_token
       })
     },
     // apiEditPost
@@ -85,23 +85,22 @@ export const usePostStore = defineStore({
       // 從 localStorage 中取出 token
       const user_token = localStorage.getItem('token');
       await axios.put('/post/' + id, {
-        title: title,
-        content: content,
-        user_token: user_token
+        title,
+        content,
+        user_token
       })
     },
     // apiDeletePost
     async apiDeletePost(id){
       const user_token = localStorage.getItem('token');
       await axios.put(`/deletepost/${id}`, {
-        user_token: user_token
+        user_token
       })
     },
     // apiGetHistoryPost
     async apiGetHistoryPost(id){
       const response = await axios.get(`/gethistorypost/${id}`)
       this.editObj = response.data
-      // this.editObj.unshift(this.postObj.find(post => post.id == id))
     },
   },
 })

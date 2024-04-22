@@ -33,8 +33,12 @@ onMounted(() => {
 })
 
 const goHome = (() => {
-  router.push('/')
-  refresh.loading = true;
+  if (router.currentRoute.value.path === '/') {
+    refresh.refresh()
+    return
+  } else {
+    router.push('/')
+  }
 })
 
 const refreshBtn = (() => {
@@ -66,19 +70,64 @@ const logoff = (async() => {
 
 watch(isDarkTheme, () => {
   if( isDarkTheme.value ) {
-    document.body.classList.add('dark')
+    document.documentElement.classList.add('dark')
     localStorage.setItem('theme','dark')
   } else {
-    document.body.classList.remove('dark')
+    document.documentElement.classList.remove('dark')
     localStorage.setItem('theme','light')
   }
 });
+
+// 把el-switch實例傳進函數switchTheme裡 
+// const switchTheme = (elSwitch) => {
+//   const transition = document.startViewTransition();
+//   // 拿到el-switch的座標
+//   const x = elSwitch.clientX;
+//   const y = elSwitch.clientY;
+
+//   const targetRadius = Math.hypot(
+//     Math.max(x, window.innerWidth - x),
+//     Math.max(y, window.innerHeight - y)
+//   );
+  
+//   if( isDarkTheme.value ) {
+//     transition.ready.then(() => {
+//       document.documentElement.animate(
+//         {
+//           clipPath: [
+//             `circle(0% at ${x}px ${y}px)`,
+//             `circle(${targetRadius}px at ${x}px ${y}px)`
+//           ]
+//         },
+//         {
+//           duration: 1000,
+//           pseudoElement: '::view-transition-new(root)',
+//         }
+//       );
+//     })
+//   } else {
+//     transition.ready.then(() => {
+//       document.documentElement.animate(
+//         {
+//           clipPath: [
+//             `circle(${targetRadius}px at ${x}px ${y}px)`,
+//             `circle(0% at ${x}px ${y}px)`
+//           ]
+//         },
+//         {
+//           duration: 1000,
+//           pseudoElement: '::view-transition-new(root)',
+//         }
+//       );
+//     })
+//   }
+// }
 </script>
 <template>
   <div class="AppHeader">
     <div class="AppHeader-globalBar">
-      <div class="AppHeader-globalBar-start" @click="goHome">
-        <span class="title">Message-Board</span>
+      <div class="AppHeader-globalBar-start">
+        <span class="title" @click="goHome">Message-Board</span>
       </div>
       <div class="AppHeader-globalBar-end">
         <!-- 刷新 -->
@@ -119,6 +168,7 @@ watch(isDarkTheme, () => {
           :active-action-icon="Moon"
           :inactive-action-icon="Sunny"
           class="themeSwitch"
+          @click="switchTheme"
         />
         <!-- 用戶頭像下拉選單：退出登陸 -->
         <el-skeleton v-if="loading" class="userAvatar" style="--el-skeleton-circle-size: 32px; display: flex;" animated>
@@ -153,8 +203,8 @@ watch(isDarkTheme, () => {
     left: 0;
     width: 100%;
     z-index: 1000;
-    background-color: var(--color-background);
-    border-bottom: 1px solid var(--color-border);
+    background-color: var(--el-bg-color);
+    border-bottom: 1px solid var(--el-border-color);
 
     .AppHeader-globalBar-start {
       flex: 1 1 auto;
@@ -174,30 +224,18 @@ watch(isDarkTheme, () => {
       flex: 0 1 auto;
       display: flex;
       align-items: center;
-      .refresh,.filter,.goTop {
-        color: var(--color-text);
-        background-color: var(--color-button);
-        border: 1px solid var(--color-switch-border);
-        &:hover{
-          background-color: var(--color-button-hover);
-        }
-        &:active{
-          background-color: var(--color-button-active);
-        }
-      }
       .goTop {
         margin-left: 12px;
       }
       .themeSwitch {
         margin-left: 12px;
-        --el-switch-on-color: var(--color-background-mute);
-        // --el-switch-off-color: var(--color-background-mute);
-        --el-switch-border-color: var(--color-switch-border);
+        --el-switch-on-color: var(--el-bg-color);
+        --el-switch-border-color: var(--el-border-color);
         .el-switch__core .el-switch__action {
-          background-color: var(--color-background);
+          background-color: var(--el-bg-color) !important;
         }
         svg {
-          color: var(--color-text);
+          color: var(--el-text-color-primary);
         }
       }
       .userAvatar {

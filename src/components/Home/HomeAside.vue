@@ -200,7 +200,7 @@ const beforeAvatarUpload = (rawFile) => {
   display: flex;
   justify-content: center;
   padding: 30px 0 0 28px;
-  border-left: 1px solid var(--color-border);
+  border-left: 1px solid var(--el-border-color);
   .asideContent {
     // position: fixed;
     display: flex;
@@ -212,8 +212,8 @@ const beforeAvatarUpload = (rawFile) => {
       align-items: center;
       width: 270px;
       padding: 10px 20px;
-      background-color: var(--color-card);
-      border: 1px solid var(--color-border);
+      background-color: var(--el-bg-color-overlay);
+      border: 1px solid var(--el-border-color);
       border-radius: 4px;
       transition: .3s;
 
@@ -244,9 +244,9 @@ const beforeAvatarUpload = (rawFile) => {
       display: flex;
       flex-direction: column;
       align-items: center;
-      border: 1px solid var(--color-border);
+      border: 1px solid var(--el-border-color);
       border-radius: 4px;
-      background-color: var(--color-card);
+      background-color: var(--el-bg-color-overlay);
       transition: .3s;
       &:hover{
         box-shadow: var(--el-box-shadow-light);
@@ -297,9 +297,9 @@ const beforeAvatarUpload = (rawFile) => {
     .statisticCard {
       display: flex;
       justify-content: space-around;
-      border: 1px solid var(--color-border);
+      border: 1px solid var(--el-border-color);
       border-radius: 4px;
-      background-color: var(--color-card);
+      background-color: var(--el-bg-color-overlay);
       transition: .3s;
       &:hover{
         box-shadow: var(--el-box-shadow-light);

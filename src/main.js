@@ -20,11 +20,6 @@ import { faThumbsUp as farThumbsUp } from '@fortawesome/free-regular-svg-icons'
 import {faRightFromBracket, faTrash, faEllipsis, faPenToSquare, faThumbsUp} from '@fortawesome/free-solid-svg-icons'
 import * as ElementPlusIconsVue from '@element-plus/icons-vue'
 
-// import every components
-import AppHeader from '@/components/AppHeader.vue'
-import AppCard from '@/components/AppCard.vue'
-import AppAside from '@/components/AppAside.vue'
-
 
 const app = createApp(App)
 
@@ -42,9 +37,5 @@ app.component('font-awesome-icon', FontAwesomeIcon)
 app.use(createPinia())
 app.use(router)
 app.use(UUID)
-
-app.component('AppHeader', AppHeader)
-  .component('AppCard', AppCard)
-  .component('AppAside', AppAside)
 
 app.mount('#app')

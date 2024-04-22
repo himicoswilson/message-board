@@ -141,7 +141,7 @@ const restore = (async() => {
     background-color: var(--color-login);
     margin: 0 auto;
     padding: 20px;
-    border: 1px solid var(--color-border);
+    border: 1px solid var(--el-border-color);
     border-radius: 6px;
 
     .username {
@@ -157,7 +157,7 @@ const restore = (async() => {
     label {
       display: block;
       margin-bottom: 5px;
-      color: var(--color-text);
+      color: var(--el-text-color-primary);
     }
 
     .loginBtn {
@@ -180,7 +180,7 @@ const restore = (async() => {
     width: 300px;
     margin: 16px auto 0 auto;
     padding: 16px;
-    border: 1px solid var(--color-border);
+    border: 1px solid var(--el-border-color);
     border-radius: 6px;
   }
 }

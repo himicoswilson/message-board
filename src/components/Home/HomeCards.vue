@@ -377,9 +377,7 @@ const getPostsLikeNum = (async() => {
   margin: 30px 0;
   padding-right: 30px;
   .card {
-    color: var(--color-text);
-    background-color: var(--color-card);
-    border: 1px solid var(--color-border);
+    border: 1px solid var(--el-border-color);
     .cardBody {
       display: flex;
       flex-direction: column;
@@ -494,7 +492,7 @@ const getPostsLikeNum = (async() => {
 .backupList, .nowList {
   display: flex;
   align-items: center;
-  border-top: 1px solid var(--color-border);
+  border-top: 1px solid var(--el-border-color);
   padding: 10px 20px;
   &:hover{
     cursor: pointer;
@@ -508,7 +506,7 @@ const getPostsLikeNum = (async() => {
   }
 }
 .historyDialogBody {
-  color: var(--color-text);
+  color: var(--el-text-color-primary);
   .historyDialogHeader {
     display: flex;
     align-items: center;
@@ -523,7 +521,7 @@ const getPostsLikeNum = (async() => {
     }
   }
   .historyDialogContent {
-    border-top: 1px solid var(--color-border);
+    border-top: 1px solid var(--el-border-color);
     padding: 16px;
     .title {
       box-shadow: inset 4px 0 0 #4ac26b66;
