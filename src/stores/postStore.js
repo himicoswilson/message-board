@@ -23,7 +23,7 @@ export const usePostStore = defineStore({
       created_at: '',
       updated_at: '',
       isLike: false,
-      likes: ''
+      likes: 0
     }],
     editObj: {
       id: '',

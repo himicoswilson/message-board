@@ -188,7 +188,7 @@ const routerPostInfo = ((id) => {
 })
 
 // 點擊讚按鈕的回調
-const likePost = (async (userToken, postId, index) => {
+const likePost = (async (userToken, postId, isLike, index) => {
   await like.apiLikePost(userToken, postId).then(() => {
     post.postObj.forEach(post => {
       if (post.id === postId) {
@@ -196,9 +196,13 @@ const likePost = (async (userToken, postId, index) => {
       }
     })
   })
+  if (isLike) {
+    // 点赞数减1
+    post.postObj[index].likes -= 1;
+  } else {
+    post.postObj[index].likes += 1;
+  }
   await getPostsLikeNum();
-  await like.apiGetPostLikeNum(postId)
-  post.postObj[index].likes = like.likePostNumObj.likes
 })
 
 const getLikePost = (async() => {
@@ -261,7 +265,7 @@ const getPostsLikeNum = (async() => {
                         <span class="username">{{ item.username }}</span>
                         <span class="date">{{ post.editObj.length ? 'edited on' : 'created on' }} {{ formatDate(item.updated_at || item.created_at) }}</span>
                       </div>
-                      <!-- 之前所有修改過的 -->
+                      <!-- 歷史紀錄 -->
                       <div 
                         class="backupList" 
                         v-show="post.editObj.length > 0" 
@@ -308,7 +312,7 @@ const getPostsLikeNum = (async() => {
           </div>
           <div class="cardFooter">
             <div class="cardLike">
-              <font-awesome-icon @click="likePost(user.token, item.id, index)" :icon="[`${item.isLike ?'fas' :'far'}`, 'thumbs-up']" />
+              <font-awesome-icon @click="likePost(user.token, item.id, item.isLike, index)" :icon="[`${item.isLike ?'fas' :'far'}`, 'thumbs-up']" />
               <span class="likeNum">{{ item.likes }}</span>
             </div>
             <div class="userData">
@@ -325,7 +329,7 @@ const getPostsLikeNum = (async() => {
       </el-card>
     </template>
   </Waterfall>
-
+  <!-- 編輯帖子的彈窗 -->
   <el-dialog v-model="dialogVisible" title="Edit Post" width="500" draggable>
     <el-form :model="editPostForm" :rules="rules" ref="postEditForm">
       <el-form-item prop="title">
@@ -484,8 +488,8 @@ const getPostsLikeNum = (async() => {
   margin-left: 5px;
 }
 .backupTitle {
-  margin-top: 12px;
-  margin-bottom: 10px;
+  margin-top: 11px;
+  margin-bottom: 11px;
   padding: 0 20px;
   font-weight: 600;
 }

@@ -22,6 +22,7 @@ a,
 .el-loading-mask {
   background-color: var(--el-bg-color) !important;
 }
+/* 歷史Post Dialog */
 .historyDialog {
   padding: 0 !important;
   header {
@@ -31,4 +32,13 @@ a,
     display: flex;
     align-items: center;
   }
+}
+/* switchTheme */
+.el-switch__core .el-switch__action{
+  background-color: #ffffff !important;
+  color: #606266 !important;
+}
+.el-switch.is-checked .el-switch__core .el-switch__action {
+  background-color: #141414 !important;
+  color: var(--el-text-color-regular) !important;
 }

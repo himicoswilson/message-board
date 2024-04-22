@@ -134,32 +134,6 @@ watch(isDarkTheme, () => {
         <el-button :icon="Refresh" circle @click="refreshBtn" class="refresh"/>
         <!-- 篩選 -->
         <el-button :icon="Filter" circle @click="dialogVisible = true" class="filter"/>
-        <el-dialog
-          v-model="dialogVisible"
-          title="篩選"
-          width="500"
-          :before-close="handleClose"
-        >
-          <el-form>
-            <!-- 選擇哪個用戶 -->
-            <el-select v-model="value" placeholder="請選擇用戶">
-              <el-option
-                v-for="item in options"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              />
-            </el-select>
-          </el-form>
-          <template #footer>
-            <div class="dialog-footer">
-              <el-button @click="dialogVisible = false">Cancel</el-button>
-              <el-button type="primary" @click="dialogVisible = false">
-                Confirm
-              </el-button>
-            </div>
-          </template>
-        </el-dialog>
         <el-button :icon="Top" circle @click="goTop" class="goTop"/>
         <!-- 切換暗色模式 -->
         <el-switch
@@ -171,7 +145,7 @@ watch(isDarkTheme, () => {
           @click="switchTheme"
         />
         <!-- 用戶頭像下拉選單：退出登陸 -->
-        <el-skeleton v-if="loading" class="userAvatar" style="--el-skeleton-circle-size: 32px; display: flex;" animated>
+        <el-skeleton v-if="loading" class="userAvatarPlace" style="--el-skeleton-circle-size: 32px; display: flex;" animated>
           <template #template>
             <el-skeleton-item variant="circle" />
           </template>
@@ -190,6 +164,32 @@ watch(isDarkTheme, () => {
       </div>
     </div>
   </div>
+  <el-dialog
+    v-model="dialogVisible"
+    title="篩選"
+    width="500"
+    :before-close="handleClose"
+  >
+    <el-form>
+      <!-- 選擇哪個用戶 -->
+      <el-select v-model="value" placeholder="請選擇用戶">
+        <el-option
+          v-for="item in options"
+          :key="item.value"
+          :label="item.label"
+          :value="item.value"
+        />
+      </el-select>
+    </el-form>
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="dialogVisible = false">Cancel</el-button>
+        <el-button type="primary" @click="dialogVisible = false">
+          Confirm
+        </el-button>
+      </div>
+    </template>
+  </el-dialog>
 </template>
 
 <style lang="less" scoped>
@@ -203,7 +203,9 @@ watch(isDarkTheme, () => {
     left: 0;
     width: 100%;
     z-index: 1000;
-    background-color: var(--el-bg-color);
+    background-image: radial-gradient(transparent 1px, var(--el-bg-color) 1px);
+    background-size: 4px 4px;
+    backdrop-filter: saturate(50%) blur(4px);
     border-bottom: 1px solid var(--el-border-color);
 
     .AppHeader-globalBar-start {
@@ -227,21 +229,29 @@ watch(isDarkTheme, () => {
       .goTop {
         margin-left: 12px;
       }
+      .el-button{
+        background-color: var(--el-bg-color);
+      }
       .themeSwitch {
         margin-left: 12px;
         --el-switch-on-color: var(--el-bg-color);
         --el-switch-border-color: var(--el-border-color);
-        .el-switch__core .el-switch__action {
-          background-color: var(--el-bg-color) !important;
-        }
-        svg {
-          color: var(--el-text-color-primary);
-        }
+        
+        // .el-switch__core .el-switch__action {
+        //   background-color: var(--el-bg-color) !important;
+        // }
+      }
+      .userAvatarPlace {
+        margin-left: 12px;
       }
       .userAvatar {
         margin-left: 12px;
+        border: 1px solid var(--el-border-color);
       }
     }
   }
+}
+.el-switch--large .el-switch__core .el-switch__action {
+  background-color: #040404 !important;
 }
 </style>
