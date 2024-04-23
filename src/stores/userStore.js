@@ -4,10 +4,12 @@ import axios from 'axios';
 export const useUserStore = defineStore({
   id: 'user',
   state: () => ({
-    id: 0,
-    username: '',
-    avatar_url: '',
-    token: '',
+    userInfo: {
+      id: 0,
+      username: '',
+      avatar_url: '',
+      token: '',
+    },
     logoffUser: {
       username: '',
       password: '',
@@ -21,19 +23,14 @@ export const useUserStore = defineStore({
     async apiGetInfo(){
       // 從 localStorage 中取出 token
       const token = localStorage.getItem('token');
-      this.token = token;
-      await axios.post('/user', {
+      const response = await axios.post('/api/getuserinfo', {
         token
-      }).then( value => {
-        const {username, avatar_url, id} = value.data
-        this.id = id;
-        this.username = username;
-        this.avatar_url = avatar_url;
       })
+      this.userInfo = response.data;
     },
     // apiLogin
     async apiLogin(username, password){
-      const response = await axios.post('/login', {
+      const response = await axios.post('/api/login', {
         username,
         password,
       });
@@ -42,7 +39,7 @@ export const useUserStore = defineStore({
     },
     // apiSignup
     async apiSignup(username, password, token){
-      await axios.post('/signup', {
+      await axios.post('/api/signup', {
         username,
         password,
         token
@@ -52,13 +49,13 @@ export const useUserStore = defineStore({
     async apiLogoff(){
       // 從 localStorage 中取出 token
       const token = localStorage.getItem('token');
-      await axios.post('/logoff', {
+      await axios.post('/api/logoff', {
         token
       });
     },
     // apiSearchLogoff
     async apiSearchLogoff(username, password){
-      await axios.post('/searchlogoff', {
+      await axios.post('/api/searchlogoff', {
         username,
         password,
       }).then((value) => {
@@ -71,7 +68,7 @@ export const useUserStore = defineStore({
     },
     // apiRestoreUser
     async apiRestoreUser(){
-      await axios.post('/restoreuser', {
+      await axios.post('/api/restoreuser', {
         username: this.logoffUser.username,
         password: this.logoffUser.password,
       });

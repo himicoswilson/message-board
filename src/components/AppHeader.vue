@@ -151,7 +151,7 @@ watch(isDarkTheme, () => {
           </template>
         </el-skeleton>
         <el-dropdown v-if="!loading">
-          <el-avatar :src="user.avatar_url" :size="32" :icon="UserFilled" class="userAvatar" />
+          <el-avatar :src="user.userInfo.avatar_url" :size="32" :icon="UserFilled" class="userAvatar" />
           <template #dropdown>
             <el-dropdown-menu>
               <el-dropdown-item @click="logout">退出登陸</el-dropdown-item>

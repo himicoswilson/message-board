@@ -49,11 +49,12 @@ const historyData = reactive({
   date: '',
   title: '',
   content: '',
-  createdOrEdited: '',
+  action: '',
 });
 
 const popperStyle = reactive({
-  width: 'auto',
+  width: '292px',
+  minHeight: '45px',
   display: 'flex',
   justifyContent: 'center',
   padding: '0px',
@@ -73,12 +74,13 @@ onMounted(async() => {
   // if (refresh.pageLocation) {
   //   postsPage.value = Number(localStorage.getItem('postsPage')) || 1;
   // }
+  await user.apiGetInfo();
   await post.apiGetPosts(postsPage.value).then(() => {
     refresh.cardsReady = true;
     localStorage.setItem('postsPage', postsPage.value);
   })
   getLikePost();
-  getPostsLikeNum();
+  // getPostsLikeNum();
 })
 
 const loadingPost = (async() => {
@@ -89,7 +91,7 @@ const loadingPost = (async() => {
     isLoading.value = true;
   })
   getLikePost();
-  getPostsLikeNum();
+  // getPostsLikeNum();
 })
 
 const editPost = ((id, title, content) => {
@@ -111,7 +113,7 @@ const editPostBtn = (async() => {
     })
     return;
   }
-  await post.apiEditPost(editPostForm.id, editPostForm.title, editPostForm.content).then(async() => {
+  await post.apiEditPost(editPostForm.id, editPostForm.title, editPostForm.content, user.userInfo.id).then(async() => {
     dialogVisible.value = false;
     // 發請求獲取某個卡片 然後重新放到對象裡
     await post.apiGetEditPost(editPostForm.id)
@@ -153,26 +155,16 @@ const deletePost = (async(id) => {
 })
 
 const debouncedGetBackup = debounce((id) => {
-  post.editObj = {
-    id: '',
-    post_id: '',
-    username: '',
-    avatar_url: '',
-    title: '',
-    content: '',
-    edited_at: '',
-    deleted_at: ''
-  };
   post.apiGetHistoryPost(id);
 }, 500, { leading: true });
 
-const showHistory = (avatar_url, username, date, title, content, createdOrEdited) => {
+const showHistory = (avatar_url, username, date, title, content, action) => {
   historyData.avatar_url = avatar_url;
   historyData.username = username;
   historyData.date = date;
   historyData.title = title;
   historyData.content = content;
-  historyData.createdOrEdited = createdOrEdited;
+  historyData.action = action;
   historyDialogVisible.value = true;
 }
 
@@ -188,25 +180,35 @@ const routerPostInfo = ((id) => {
 })
 
 // 點擊讚按鈕的回調
-const likePost = (async (userToken, postId, isLike, index) => {
-  await like.apiLikePost(userToken, postId).then(() => {
+const likePost = (async (uid, pid, isLike, index) => {
+  console.log(uid);
+  await like.apiLikePost(uid, pid).then(() => {
     post.postObj.forEach(post => {
-      if (post.id === postId) {
+      if (post.id === pid) {
         post.isLike = !post.isLike
       }
     })
   })
   if (isLike) {
     // 点赞数减1
-    post.postObj[index].likes -= 1;
+    post.postObj[index].like_num -= 1;
   } else {
-    post.postObj[index].likes += 1;
+    post.postObj[index].like_num += 1;
   }
-  await getPostsLikeNum();
+  try {
+    await like.apiGetPostLikeNum(pid)
+  } catch {
+    // eslint-disable-next-line no-undef
+    ElNotification({
+      message: 'Like failed!',
+      type: 'error',
+      position: 'bottom-right',
+    })
+  }
 })
 
 const getLikePost = (async() => {
-  await like.apiGetLikePost(user.token).then(() => {
+  await like.apiGetLikePost(user.userInfo.id).then(() => {
     post.postObj.forEach(post => {
       if (like.likePosts.includes(post.id)) {
         post.isLike = true
@@ -215,9 +217,9 @@ const getLikePost = (async() => {
   })
 })
 
-const getPostsLikeNum = (async() => {
-  await like.apiGetPostsLikeNum();
-})
+// const getPostsLikeNum = (async() => {
+//   await like.apiGetPostsLikeNum();
+// })
 </script>
 
 <template>
@@ -253,31 +255,20 @@ const getPostsLikeNum = (async() => {
                   @before-enter="debouncedGetBackup(item.id)"
                 >
                   <div>
-                    <div class="backupTitle">Edited {{ post.editObj.length || 0 }} time</div>
-                      <!-- 最新的一條 -->
-                      <div 
-                        class="nowList" 
-                        @click="showHistory(item.avatar_url, item.username, item.updated_at || item.created_at, item.title, item.content, post.editObj.length ? 'edited on' : 'created on')"
-                      >
-                        <el-avatar :src="item.avatar_url" :size="22"  class="userAvatar" >
-                          <el-icon size="14"><UserFilled /></el-icon>
-                        </el-avatar>
-                        <span class="username">{{ item.username }}</span>
-                        <span class="date">{{ post.editObj.length ? 'edited on' : 'created on' }} {{ formatDate(item.updated_at || item.created_at) }}</span>
-                      </div>
+                    <div class="backupTitle"> {{ post.editObj.length ? `Edited ${post.editObj.length - 1} time` : '' }} </div>
                       <!-- 歷史紀錄 -->
                       <div 
                         class="backupList" 
                         v-show="post.editObj.length > 0" 
-                        @click="showHistory(edit.avatar_url, edit.username, edit.edited_at, edit.title, edit.content, post.editObj.length === 1 ? 'created on' : (index ? 'created on' : 'edited on'))"
-                        v-for="(edit, index) in post.editObj" 
+                        @click="showHistory(edit.avatar_url, edit.username, edit.created_at, edit.title, edit.content, edit.action)"
+                        v-for="edit in post.editObj" 
                         :key="edit.id"
                       >
                         <el-avatar :src="edit.avatar_url" :size="22"  class="userAvatar" >
                           <el-icon size="14"><UserFilled /></el-icon>
                         </el-avatar>
                         <span class="username">{{ edit.username }}</span>
-                        <span class="date">{{ post.editObj.length === 1 ? 'created on' : (index ? 'created on' : 'edited on') }} {{ formatDate(edit.edited_at) }}</span>
+                        <span class="date">{{ edit.action + " at" }} {{ formatDate(edit.created_at) }}</span>
                       </div>
                       
                   </div>
@@ -287,7 +278,7 @@ const getPostsLikeNum = (async() => {
                 </el-popover>
               </div>
               <!-- 操作按鈕 -->
-              <el-dropdown size="small" trigger="click" class="moreBtn" v-show="item.username === user.username">
+              <el-dropdown size="small" trigger="click" class="moreBtn" v-show="item.username === user.userInfo.username">
                 <font-awesome-icon :icon="['fas', 'ellipsis']" />
                 <template #dropdown>
                   <el-dropdown-menu>
@@ -312,8 +303,8 @@ const getPostsLikeNum = (async() => {
           </div>
           <div class="cardFooter">
             <div class="cardLike">
-              <font-awesome-icon @click="likePost(user.token, item.id, item.isLike, index)" :icon="[`${item.isLike ?'fas' :'far'}`, 'thumbs-up']" />
-              <span class="likeNum">{{ item.likes }}</span>
+              <font-awesome-icon @click="likePost(user.userInfo.id, item.id, item.isLike, index)" :icon="[`${item.isLike ?'fas' :'far'}`, 'thumbs-up']" />
+              <span class="likeNum">{{ item.like_num }}</span>
             </div>
             <div class="userData">
               <el-avatar :src="item.avatar_url" :size="22"  class="userAvatar" >
@@ -352,6 +343,7 @@ const getPostsLikeNum = (async() => {
       </div>
     </template>
   </el-dialog>
+  <!-- 歷史記錄 -->
   <el-dialog v-model="historyDialogVisible"  width="500" class="historyDialog">
     <div class="historyDialogBody">
       <div class="historyDialogHeader">
@@ -359,7 +351,7 @@ const getPostsLikeNum = (async() => {
           <el-icon size="14"><UserFilled /></el-icon>
         </el-avatar>
         <span class="username">{{ historyData.username }}</span>
-        <span class="date">{{ historyData.createdOrEdited }} {{ formatDate(historyData.date) }}</span>
+        <span class="date">{{ historyData.action }} {{ formatDate(historyData.date) }}</span>
       </div>
       <div class="historyDialogContent">
         <div class="title"><span>{{ historyData.title }}</span></div>

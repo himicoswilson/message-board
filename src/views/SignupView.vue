@@ -30,9 +30,7 @@ const rules = reactive({
 const getSignup = (async() => {
   await signupForm.value.validate();
   try {
-    await user.apiSignup(userValidateForm.username, userValidateForm.password, token).then(value => {
-      console.log(value);
-    })
+    await user.apiSignup(userValidateForm.username, userValidateForm.password, token)
     await user.apiLogin(userValidateForm.username, userValidateForm.password).then(() => {
       // 将 token 存储到 localStorage
       localStorage.setItem('token', token);

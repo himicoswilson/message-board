@@ -23,29 +23,29 @@ export const usePostStore = defineStore({
       created_at: '',
       updated_at: '',
       isLike: false,
-      likes: 0
+      like_num: 0
     }],
     editObj: {
       id: '',
-      post_id: '',
+      pid: '',
       username: '',
       avatar_url: '',
       title: '',
       content: '',
-      edited_at: '',
-      deleted_at: ''
+      created_at: '',
+      action: ''
     }
   }),
 
   actions: {
     // apiGetPost
-    async apiGetPost(id){
-      const response = await axios.get(`/getpost/${id}`)
+    async apiGetPost(pid){
+      const response = await axios.get('/api/getpost/' + pid)
       this.post = response.data
     },
     // apiGetPosts
     async apiGetPosts(page){
-      const response = await axios.get(`/getposts/${page}`)
+      const response = await axios.get('/api/getposts/' + page)
       if (page == 1){
         this.postObj = response.data
       } else {
@@ -54,16 +54,15 @@ export const usePostStore = defineStore({
     },
     // apiGetPost
     async apiGetNewPost(){
-      const response = await axios.get(`/getnewpost`)
-      const newPosts = response.data
-      this.postObj.unshift(newPosts);
+      const response = await axios.get('/api/getnewpost')
+      this.postObj.unshift(response.data);
     },
     // apiGetEditPost
-    async apiGetEditPost(id){
-      const response = await axios.get(`/geteditpost/${id}`)
+    async apiGetEditPost(pid){
+      const response = await axios.get('/api/geteditpost/' + pid)
       // 把修改過的在數組中替換掉
       this.postObj = this.postObj.map(post => {
-        if (post.id == id){
+        if (post.id == pid){
           return response.data
         } else {
           return post
@@ -71,35 +70,34 @@ export const usePostStore = defineStore({
       })
     },
     // apiPostMsg
-    async apiPostMsg(title, content){
-      // 從 localStorage 中取出 token
-      const user_token = localStorage.getItem('token');
-      await axios.post('/post', {
+    async apiPostMsg(title, content, uid){
+      await axios.post('/api/post', {
         title,
         content,
-        user_token
+        uid
       })
     },
     // apiEditPost
-    async apiEditPost(id, title, content){
+    async apiEditPost(pid, title, content, uid){
       // 從 localStorage 中取出 token
       const user_token = localStorage.getItem('token');
-      await axios.put('/post/' + id, {
+      await axios.put('/api/post/' + pid, {
         title,
         content,
+        uid,
         user_token
       })
     },
     // apiDeletePost
-    async apiDeletePost(id){
+    async apiDeletePost(pid){
       const user_token = localStorage.getItem('token');
-      await axios.put(`/deletepost/${id}`, {
+      await axios.put('/api/deletepost/' + pid, {
         user_token
       })
     },
     // apiGetHistoryPost
-    async apiGetHistoryPost(id){
-      const response = await axios.get(`/gethistorypost/${id}`)
+    async apiGetHistoryPost(pid){
+      const response = await axios.get('/api/gethistorypost/' + pid)
       this.editObj = response.data
     },
   },

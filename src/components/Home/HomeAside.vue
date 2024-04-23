@@ -8,11 +8,14 @@ import { usePostStore } from '@/stores/postStore'
 import { useCountStore } from '@/stores/countStore'
 // 引入 refreshStore
 import { useRefreshStore } from '@/stores/refreshStore'
+// 引入 likeStore
+import { useLikeStore } from '@/stores/likeStore'
 
 const user = useUserStore();
 const post = usePostStore();
 const count = useCountStore();
 const refresh = useRefreshStore();
+const like = useLikeStore();
 
 const postForm = ref();
 const formInline = reactive({
@@ -38,15 +41,17 @@ onMounted(async () => {
 
 const apiGetCountInfo = (async () => {
   await count.apiGetPostCount();
-  await count.apiGetUserPostCount();
+  await count.apiGetUserPostCount(user.userInfo.id);
   await count.apiGetUserCountCompare();
   await count.apiGetPostCountCompare();
 })
 
 const submitPost = (async () => {
   await postForm.value.validate();
-  await post.apiPostMsg(formInline.title, formInline.content).then(() => {
-    post.apiGetNewPost();
+  await post.apiPostMsg(formInline.title, formInline.content, user.userInfo.id).then(async() => {
+    await post.apiGetNewPost();
+    post.postObj[0].like_num = 0;
+    await like.apiGetPostLikeNum(post.postObj[0].id);
     apiGetCountInfo();
     // eslint-disable-next-line no-undef
     ElNotification({
@@ -83,8 +88,8 @@ const handleAvatarSuccess = (async (res) => {
   await user.apiGetInfo()
   // 去post.postObj裡尋找與user.username 相同的對象，改變對象裡的avatar_url為user.avatar_url
   post.postObj.forEach((element) => {
-    if (element.username === user.username) {
-      element.avatar_url = user.avatar_url;
+    if (element.username === user.userInfo.username) {
+      element.avatar_url = user.userInfo.avatar_url;
     }
   })
 })
@@ -131,22 +136,22 @@ const beforeAvatarUpload = (rawFile) => {
         <div class="userInfoContent">
           <el-upload
             class="avatarUploader"
-            action="http://47.100.101.113:3000/uploadavatar"
+            action="http://47.100.101.113:3000/api/uploadavatar"
             :show-file-list="false"
-            :data="{ id: user.id }"
+            :data="{ uid: user.userInfo.id }"
             :on-success="handleAvatarSuccess"
             :before-upload="beforeAvatarUpload"
           >
             <el-icon class="avatarUploaderIcon"><Plus /></el-icon>
             <div class="userAvatarMask"></div>
-            <el-avatar :src="user.avatar_url" :size="64" class="userAvatar" >
+            <el-avatar :src="user.userInfo.avatar_url" :size="64" class="userAvatar" >
               <el-icon size="40"><UserFilled /></el-icon>
             </el-avatar>
           </el-upload>
-          <span>{{ user.username }}</span>
+          <span>{{ user.userInfo.username }}</span>
         </div>
         <el-col :span="20" class="userCounts">
-          <el-statistic title="UID" :value="user.id" />
+          <el-statistic title="UID" :value="user.userInfo.id" />
           <el-statistic title="Post" :value="count.userPostCount" />
         </el-col>
       </div>
