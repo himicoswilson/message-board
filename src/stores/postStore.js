@@ -40,12 +40,12 @@ export const usePostStore = defineStore({
   actions: {
     // apiGetPost
     async apiGetPost(pid){
-      const response = await axios.get('/api/getpost/' + pid)
+      const response = await axios.get('/api/posts/' + pid)
       this.post = response.data
     },
     // apiGetPosts
     async apiGetPosts(page){
-      const response = await axios.get('/api/getposts/' + page)
+      const response = await axios.get('/api/posts/page/' + page)
       if (page == 1){
         this.postObj = response.data
       } else {
@@ -54,12 +54,12 @@ export const usePostStore = defineStore({
     },
     // apiGetPost
     async apiGetNewPost(){
-      const response = await axios.get('/api/getnewpost')
+      const response = await axios.get('/api/posts/newest')
       this.postObj.unshift(response.data);
     },
     // apiGetEditPost
     async apiGetEditPost(pid){
-      const response = await axios.get('/api/geteditpost/' + pid)
+      const response = await axios.get('/api/posts/edit/' + pid)
       // 把修改過的在數組中替換掉
       this.postObj = this.postObj.map(post => {
         if (post.id == pid){
@@ -71,7 +71,7 @@ export const usePostStore = defineStore({
     },
     // apiPostMsg
     async apiPostMsg(title, content, uid){
-      await axios.post('/api/post', {
+      await axios.post('/api/posts/create', {
         title,
         content,
         uid
@@ -81,7 +81,7 @@ export const usePostStore = defineStore({
     async apiEditPost(pid, title, content, uid){
       // 從 localStorage 中取出 token
       const user_token = localStorage.getItem('token');
-      await axios.put('/api/post/' + pid, {
+      await axios.put('/api/posts/get_edit/' + pid, {
         title,
         content,
         uid,
@@ -91,13 +91,13 @@ export const usePostStore = defineStore({
     // apiDeletePost
     async apiDeletePost(pid){
       const user_token = localStorage.getItem('token');
-      await axios.put('/api/deletepost/' + pid, {
+      await axios.put('/api/posts/delete/' + pid, {
         user_token
       })
     },
     // apiGetHistoryPost
     async apiGetHistoryPost(pid){
-      const response = await axios.get('/api/gethistorypost/' + pid)
+      const response = await axios.get('/api/posts/history/' + pid)
       this.editObj = response.data
     },
   },

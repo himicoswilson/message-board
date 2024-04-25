@@ -11,26 +11,22 @@ export const useLikeStore = defineStore({
   actions: {
     // apiLikePost
     async apiLikePost(uid, pid) {
-      await axios.post('/api/likepost', {
+      await axios.post('/api/posts/like', {
         uid,
         pid,
       })
     },
     // apiGetLikePost
     async apiGetLikePost(uid) {
-      const response = await axios.post('/api/getlikepost', {
+      const response = await axios.post('/api/users/likes', {
         uid,
       })
       // 把response.data裡面的post_id全部存進likePost，以數組的方式
       this.likePosts = response.data.map(item => item.pid);
     },
-    // apiGetEveryPostLikeNum
-    async apiGetPostsLikeNum() {
-      await axios.post('/api/getpostslikenum')
-    },
     // apiGetPostLikeNum
     async apiGetPostLikeNum(pid) {
-      await axios.post('/api/getpostlikenum', {
+      await axios.post('/api/posts/like_num', {
         pid
       })
     },

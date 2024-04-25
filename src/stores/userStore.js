@@ -23,14 +23,14 @@ export const useUserStore = defineStore({
     async apiGetInfo(){
       // 從 localStorage 中取出 token
       const token = localStorage.getItem('token');
-      const response = await axios.post('/api/getuserinfo', {
+      const response = await axios.post('/api/users/info', {
         token
       })
       this.userInfo = response.data;
     },
     // apiLogin
     async apiLogin(username, password){
-      const response = await axios.post('/api/login', {
+      const response = await axios.post('/api/auth/login', {
         username,
         password,
       });
@@ -39,7 +39,7 @@ export const useUserStore = defineStore({
     },
     // apiSignup
     async apiSignup(username, password, token){
-      await axios.post('/api/signup', {
+      await axios.post('/api/auth/signup', {
         username,
         password,
         token
@@ -49,13 +49,13 @@ export const useUserStore = defineStore({
     async apiLogoff(){
       // 從 localStorage 中取出 token
       const token = localStorage.getItem('token');
-      await axios.post('/api/logoff', {
+      await axios.post('/api/auth/logoff', {
         token
       });
     },
     // apiSearchLogoff
     async apiSearchLogoff(username, password){
-      await axios.post('/api/searchlogoff', {
+      await axios.post('/api/users/search_logoff', {
         username,
         password,
       }).then((value) => {
@@ -68,7 +68,7 @@ export const useUserStore = defineStore({
     },
     // apiRestoreUser
     async apiRestoreUser(){
-      await axios.post('/api/restoreuser', {
+      await axios.post('/api/users/search_logoff', {
         username: this.logoffUser.username,
         password: this.logoffUser.password,
       });

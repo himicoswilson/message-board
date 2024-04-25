@@ -136,7 +136,7 @@ const beforeAvatarUpload = (rawFile) => {
         <div class="userInfoContent">
           <el-upload
             class="avatarUploader"
-            action="http://47.100.101.113:3000/api/uploadavatar"
+            action="http://47.100.101.113:3000/api/upload/avatar"
             :show-file-list="false"
             :data="{ uid: user.userInfo.id }"
             :on-success="handleAvatarSuccess"

@@ -15,29 +15,29 @@ export const useCountStore = defineStore({
   actions: {
     // apiGetUserCount
     async apiGetUserCount(){
-      const response = await axios.get('/api/getusercount')
+      const response = await axios.get('/api/counts/users')
       this.userCount = response.data.userCount
     },
     // apiGetPostCount
     async apiGetPostCount(){
-      const response = await axios.get('/api/getpostcount')
+      const response = await axios.get('/api/counts/posts')
       this.postCount = response.data.postCount
     },
     // apiGetUserPostCount
     async apiGetUserPostCount(uid){
-      const response = await axios.post('/api/getuserpostcount', {
+      const response = await axios.post('/api/counts/post', {
         uid
       })
       this.userPostCount = response.data.userPostCount
     },
     // apiGetUserCountCompare  
     async apiGetUserCountCompare(){
-      const response = await axios.get('/api/apigetusercountcompare')
+      const response = await axios.get('/api/counts/users/compare')
       this.compareUserCount = response.data.compareUserCount
     },
     // apiGetPostCountCompare  
     async apiGetPostCountCompare(){
-      const response = await axios.get('/api/apigetpostcountcompare')
+      const response = await axios.get('/api/counts/posts/compare')
       this.comparePostCount = response.data.comparePostCount
     },
   },

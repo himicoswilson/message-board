@@ -19,8 +19,11 @@ watch(
 <template>
   <div class="App">
     <AppHeader />
-    <div class="AppContainer" v-loading="refresh.loading">
-      <PostInfo :key="refresh.flag" />
+    <div class="AppContainer">
+      <div>
+        <PostCard :key="refresh.flag" />
+        <!-- <PostCmt :key="refresh.flag" /> -->
+      </div>
       <PostAside :key="refresh.flag" />
     </div>
   </div>
