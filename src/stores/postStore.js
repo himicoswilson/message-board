@@ -40,7 +40,7 @@ export const usePostStore = defineStore({
   actions: {
     // apiGetPost
     async apiGetPost(pid){
-      const response = await axios.get('/api/posts/' + pid)
+      const response = await axios.get('/api/posts/post/' + pid)
       this.post = response.data
     },
     // apiGetPosts
@@ -59,7 +59,7 @@ export const usePostStore = defineStore({
     },
     // apiGetEditPost
     async apiGetEditPost(pid){
-      const response = await axios.get('/api/posts/edit/' + pid)
+      const response = await axios.get('/api/posts/get_edit/' + pid)
       // 把修改過的在數組中替換掉
       this.postObj = this.postObj.map(post => {
         if (post.id == pid){
@@ -81,7 +81,7 @@ export const usePostStore = defineStore({
     async apiEditPost(pid, title, content, uid){
       // 從 localStorage 中取出 token
       const user_token = localStorage.getItem('token');
-      await axios.put('/api/posts/get_edit/' + pid, {
+      await axios.put('/api/posts/edit/' + pid, {
         title,
         content,
         uid,

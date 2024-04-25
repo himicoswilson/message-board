@@ -43,6 +43,7 @@ const editPostForm = reactive({
   content: '',
 });
 
+// 歷史紀錄詳情的對象
 const historyData = reactive({
   avatar_url: '',
   username: '',
@@ -52,6 +53,7 @@ const historyData = reactive({
   action: '',
 });
 
+// popper樣式
 const popperStyle = reactive({
   width: '292px',
   minHeight: '45px',
@@ -61,6 +63,7 @@ const popperStyle = reactive({
   zIndex: '1'
 });
 
+// 修改Post的验证规则
 const rules = reactive({
   title: [
     { required: true, message: 'Please input title', trigger: 'change' },
@@ -70,6 +73,7 @@ const rules = reactive({
   ],
 })
 
+// 掛載時
 onMounted(async() => {
   // if (refresh.pageLocation) {
   //   postsPage.value = Number(localStorage.getItem('postsPage')) || 1;
@@ -80,20 +84,26 @@ onMounted(async() => {
     localStorage.setItem('postsPage', postsPage.value);
   })
   getLikePost();
-  // getPostsLikeNum();
 })
 
+// 加載更多post的回調
 const loadingPost = (async() => {
   postsPage.value += 1;
   await post.apiGetPosts(postsPage.value).then(() => {
     localStorage.setItem('postsPage', postsPage.value);
   }).catch(() => {
     isLoading.value = true;
+    // eslint-disable-next-line no-undef
+    ElNotification({
+      message: 'No more post!',
+      type: 'warning',
+      position:'bottom-right',
+    })
   })
   getLikePost();
-  // getPostsLikeNum();
 })
 
+// 編輯按鈕的回調
 const editPost = ((id, title, content) => {
   editPostForm.id = id;
   editPostForm.title = title;
@@ -101,6 +111,7 @@ const editPost = ((id, title, content) => {
   dialogVisible.value = true;
 })
 
+// 編輯確定的回調
 const editPostBtn = (async() => {
   await postEditForm.value.validate();
   // 從post.postObj 找到對應的卡片 並且校驗是否相同
@@ -133,6 +144,7 @@ const editPostBtn = (async() => {
   })
 })
 
+// 刪除卡片的回調
 const deletePost = (async(id) => {
   await post.apiDeletePost(id).then(() => {
     // 刪除成功後刪除該卡片
@@ -153,11 +165,12 @@ const deletePost = (async(id) => {
     })
   })
 })
-
+// 獲取歷史記錄按鈕的回調
 const debouncedGetBackup = debounce((id) => {
   post.apiGetHistoryPost(id);
 }, 500, { leading: true });
 
+// 歷史記錄詳情的回調
 const showHistory = (avatar_url, username, date, title, content, action) => {
   historyData.avatar_url = avatar_url;
   historyData.username = username;
@@ -168,6 +181,7 @@ const showHistory = (avatar_url, username, date, title, content, action) => {
   historyDialogVisible.value = true;
 }
 
+// 獲取統計的數據
 const apiGetCountInfo = (async() => {
   await count.apiGetPostCount();
   await count.apiGetUserPostCount();
@@ -175,13 +189,13 @@ const apiGetCountInfo = (async() => {
   await count.apiGetPostCountCompare();
 })
 
+// 點擊卡片的回調
 const routerPostInfo = ((id) => {
   router.push({ path: `/posts/${id}` });
 })
 
 // 點擊讚按鈕的回調
 const likePost = (async (uid, pid, isLike, index) => {
-  console.log(uid);
   await like.apiLikePost(uid, pid).then(() => {
     post.postObj.forEach(post => {
       if (post.id === pid) {
@@ -195,6 +209,7 @@ const likePost = (async (uid, pid, isLike, index) => {
   } else {
     post.postObj[index].like_num += 1;
   }
+  // 獲取卡片的按讚數
   try {
     await like.apiGetPostLikeNum(pid)
   } catch {
@@ -207,6 +222,7 @@ const likePost = (async (uid, pid, isLike, index) => {
   }
 })
 
+// 獲取用戶按過的卡片，匹配後設置isLike
 const getLikePost = (async() => {
   await like.apiGetLikePost(user.userInfo.id).then(() => {
     post.postObj.forEach(post => {
@@ -217,9 +233,6 @@ const getLikePost = (async() => {
   })
 })
 
-// const getPostsLikeNum = (async() => {
-//   await like.apiGetPostsLikeNum();
-// })
 </script>
 
 <template>
