@@ -27,7 +27,7 @@ for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
   app.component(key, component)
 }
 
-axios.defaults.baseURL = 'http://47.100.101.113:3000'
+axios.defaults.baseURL = 'http://localhost:3000'
 
 /* add icons to the library */
 library.add(faRightFromBracket, faTrash, faEllipsis, faPenToSquare, faThumbsUp, farThumbsUp)

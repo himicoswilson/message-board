@@ -38,8 +38,9 @@ export const useUserStore = defineStore({
       localStorage.setItem('token', response.data.token);
     },
     // apiSignup
-    async apiSignup(username, password, token){
+    async apiSignup(email, username, password, token){
       await axios.post('/api/auth/signup', {
+        email,
         username,
         password,
         token

@@ -80,7 +80,6 @@ const restore = (async() => {
 
 <template>
   <div class="loginContainer">
-    <img src="../assets/images/logo.webp" alt="this is message board logo." class="logo">
     <h1 class="loginTitle">Login to MessageBoard</h1>
     <el-form class="login-form" :model="userValidateForm" :rules="rules" ref="loginForm">
       <label class="username" for="username">Username or email address</label>
