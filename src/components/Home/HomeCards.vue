@@ -13,35 +13,35 @@ import { useRefreshStore } from '@/stores/refreshStore'
 // 引入 useLikeStore
 import { useLikeStore } from '@/stores/likeStore'
 // 引入 ref...
-import { ref, onMounted, reactive } from 'vue';
+import { ref, onMounted, reactive } from 'vue'
 // 引入 icon
-import { UserFilled } from "@element-plus/icons-vue";
+import { UserFilled } from '@element-plus/icons-vue'
 // 引入 formatDate
 import { formatDate } from '@/math/index.js'
 // 引入 debounce
-import { debounce } from 'lodash';
+import { debounce } from 'lodash'
 // 引入 router
-import { useRouter } from 'vue-router';
+import { useRouter } from 'vue-router'
 
 const post = usePostStore()
 const user = useUserStore()
-const count = useCountStore();
+const count = useCountStore()
 const refresh = useRefreshStore()
 const like = useLikeStore()
 
-const router = useRouter();
+const router = useRouter()
 
-const postsPage = ref(1);
-const isLoading = ref(false);
-const dialogVisible = ref(false);
-const historyDialogVisible = ref(false);
-const postEditForm = ref();
+const postsPage = ref(1)
+const isLoading = ref(false)
+const dialogVisible = ref(false)
+const historyDialogVisible = ref(false)
+const postEditForm = ref()
 
 const editPostForm = reactive({
   id: '',
   title: '',
-  content: '',
-});
+  content: ''
+})
 
 // 歷史紀錄詳情的對象
 const historyData = reactive({
@@ -50,8 +50,8 @@ const historyData = reactive({
   date: '',
   title: '',
   content: '',
-  action: '',
-});
+  action: ''
+})
 
 // popper樣式
 const popperStyle = reactive({
@@ -61,143 +61,155 @@ const popperStyle = reactive({
   justifyContent: 'center',
   padding: '0px',
   zIndex: '1'
-});
+})
 
 // 修改Post的验证规则
 const rules = reactive({
-  title: [
-    { required: true, message: 'Please input title', trigger: 'change' },
-  ],
-  content: [
-    { required: true, message: 'Please input content', trigger: 'change' },
-  ],
+  title: [{ required: true, message: 'Please input title', trigger: 'change' }],
+  content: [{ required: true, message: 'Please input content', trigger: 'change' }]
 })
 
 // 掛載時
-onMounted(async() => {
+onMounted(async () => {
   // if (refresh.pageLocation) {
   //   postsPage.value = Number(localStorage.getItem('postsPage')) || 1;
   // }
-  await user.apiGetInfo();
+  await user.apiGetInfo()
   await post.apiGetPosts(postsPage.value).then(() => {
-    refresh.cardsReady = true;
-    localStorage.setItem('postsPage', postsPage.value);
+    refresh.cardsReady = true
+    localStorage.setItem('postsPage', postsPage.value)
   })
-  getLikePost();
+  getLikePost()
 })
 
 // 加載更多post的回調
-const loadingPost = (async() => {
-  postsPage.value += 1;
-  await post.apiGetPosts(postsPage.value).then(() => {
-    localStorage.setItem('postsPage', postsPage.value);
-  }).catch(() => {
-    isLoading.value = true;
-    // eslint-disable-next-line no-undef
-    ElNotification({
-      message: 'No more post!',
-      type: 'warning',
-      position:'bottom-right',
+const loadingPost = async () => {
+  postsPage.value += 1
+  await post
+    .apiGetPosts(postsPage.value)
+    .then(() => {
+      localStorage.setItem('postsPage', postsPage.value)
     })
-  })
-  getLikePost();
-})
+    .catch(() => {
+      isLoading.value = true
+      // eslint-disable-next-line no-undef
+      ElNotification({
+        message: 'No more post!',
+        type: 'warning',
+        position: 'bottom-right'
+      })
+    })
+  getLikePost()
+}
 
 // 編輯按鈕的回調
-const editPost = ((id, title, content) => {
-  editPostForm.id = id;
-  editPostForm.title = title;
-  editPostForm.content = content;
-  dialogVisible.value = true;
-})
+const editPost = (id, title, content) => {
+  editPostForm.id = id
+  editPostForm.title = title
+  editPostForm.content = content
+  dialogVisible.value = true
+}
 
 // 編輯確定的回調
-const editPostBtn = (async() => {
-  await postEditForm.value.validate();
+const editPostBtn = async () => {
+  await postEditForm.value.validate()
   // 從post.postObj 找到對應的卡片 並且校驗是否相同
-  if (post.postObj.find(item => item.id === editPostForm.id).title === editPostForm.title && post.postObj.find(item => item.id === editPostForm.id).content === editPostForm.content) {
+  if (
+    post.postObj.find((item) => item.id === editPostForm.id).title === editPostForm.title &&
+    post.postObj.find((item) => item.id === editPostForm.id).content === editPostForm.content
+  ) {
     // eslint-disable-next-line no-undef
     ElNotification({
       message: 'No changes were made!',
       type: 'warning',
-      position:'bottom-right',
+      position: 'bottom-right'
     })
-    return;
+    return
   }
-  await post.apiEditPost(editPostForm.id, editPostForm.title, editPostForm.content, user.userInfo.id).then(async() => {
-    dialogVisible.value = false;
-    // 發請求獲取某個卡片 然後重新放到對象裡
-    await post.apiGetEditPost(editPostForm.id)
-    // eslint-disable-next-line no-undef
-    ElNotification({
-      message: 'Edited successfully!',
-      type: 'success',
-      position: 'bottom-right',
+  await post
+    .apiEditPost(editPostForm.id, editPostForm.title, editPostForm.content, user.userInfo.id)
+    .then(async () => {
+      dialogVisible.value = false
+      // 發請求獲取某個卡片 然後重新放到對象裡
+      await post.apiGetEditPost(editPostForm.id)
+      // eslint-disable-next-line no-undef
+      ElNotification({
+        message: 'Edited successfully!',
+        type: 'success',
+        position: 'bottom-right'
+      })
     })
-  }).catch(() => {
-    // eslint-disable-next-line no-undef
-    ElNotification({
-      message: 'Edited failed!',
-      type: 'error',
-      position: 'bottom-right',
+    .catch(() => {
+      // eslint-disable-next-line no-undef
+      ElNotification({
+        message: 'Edited failed!',
+        type: 'error',
+        position: 'bottom-right'
+      })
     })
-  })
-})
+}
 
 // 刪除卡片的回調
-const deletePost = (async(id) => {
-  await post.apiDeletePost(id).then(() => {
-    // 刪除成功後刪除該卡片
-    post.postObj = post.postObj.filter(item => item.id !== id);
-    apiGetCountInfo();
-    // eslint-disable-next-line no-undef
-    ElNotification({
-      message: 'Delete successfully!',
-      type: 'success',
-      position: 'bottom-right',
+const deletePost = async (id) => {
+  await post
+    .apiDeletePost(id)
+    .then(() => {
+      // 刪除成功後刪除該卡片
+      post.postObj = post.postObj.filter((item) => item.id !== id)
+      apiGetCountInfo()
+      // eslint-disable-next-line no-undef
+      ElNotification({
+        message: 'Delete successfully!',
+        type: 'success',
+        position: 'bottom-right'
+      })
     })
-  }).catch (() => {
-    // eslint-disable-next-line no-undef
-    ElNotification({
-      message: 'Delete failed!',
-      type: 'error',
-      position: 'bottom-right',
+    .catch(() => {
+      // eslint-disable-next-line no-undef
+      ElNotification({
+        message: 'Delete failed!',
+        type: 'error',
+        position: 'bottom-right'
+      })
     })
-  })
-})
+}
 // 獲取歷史記錄按鈕的回調
-const debouncedGetBackup = debounce((id) => {
-  post.apiGetHistoryPost(id);
-}, 500, { leading: true });
+const debouncedGetBackup = debounce(
+  (id) => {
+    post.apiGetHistoryPost(id)
+  },
+  500,
+  { leading: true }
+)
 
 // 歷史記錄詳情的回調
 const showHistory = (avatar_url, username, date, title, content, action) => {
-  historyData.avatar_url = avatar_url;
-  historyData.username = username;
-  historyData.date = date;
-  historyData.title = title;
-  historyData.content = content;
-  historyData.action = action;
-  historyDialogVisible.value = true;
+  historyData.avatar_url = avatar_url
+  historyData.username = username
+  historyData.date = date
+  historyData.title = title
+  historyData.content = content
+  historyData.action = action
+  historyDialogVisible.value = true
 }
 
 // 獲取統計的數據
-const apiGetCountInfo = (async() => {
-  await count.apiGetPostCount();
-  await count.apiGetUserPostCount();
-  await count.apiGetUserCountCompare();
-  await count.apiGetPostCountCompare();
-})
+const apiGetCountInfo = async () => {
+  await count.apiGetPostCount()
+  await count.apiGetUserPostCount()
+  await count.apiGetUserCountCompare()
+  await count.apiGetPostCountCompare()
+}
 
 // 點擊卡片的回調
-const routerPostInfo = ((id) => {
-  router.push({ path: `/posts/${id}` });
-})
+const routerPostInfo = (id) => {
+  router.push({ path: `/posts/${id}` })
+}
 
 // 點擊讚按鈕的回調
-const likePost = (async (uid, pid, isLike, index) => {
+const likePost = async (uid, pid, isLike, index) => {
   await like.apiLikePost(uid, pid).then(() => {
-    post.postObj.forEach(post => {
+    post.postObj.forEach((post) => {
       if (post.id === pid) {
         post.isLike = !post.isLike
       }
@@ -205,9 +217,9 @@ const likePost = (async (uid, pid, isLike, index) => {
   })
   if (isLike) {
     // 点赞数减1
-    post.postObj[index].like_num -= 1;
+    post.postObj[index].like_num -= 1
   } else {
-    post.postObj[index].like_num += 1;
+    post.postObj[index].like_num += 1
   }
   // 獲取卡片的按讚數
   try {
@@ -217,22 +229,21 @@ const likePost = (async (uid, pid, isLike, index) => {
     ElNotification({
       message: 'Like failed!',
       type: 'error',
-      position: 'bottom-right',
+      position: 'bottom-right'
     })
   }
-})
+}
 
 // 獲取用戶按過的卡片，匹配後設置isLike
-const getLikePost = (async() => {
+const getLikePost = async () => {
   await like.apiGetLikePost(user.userInfo.id).then(() => {
-    post.postObj.forEach(post => {
+    post.postObj.forEach((post) => {
       if (like.likePosts.includes(post.id)) {
         post.isLike = true
       }
     })
   })
-})
-
+}
 </script>
 
 <template>
@@ -247,43 +258,55 @@ const getLikePost = (async() => {
     :hasAroundGutter="false"
     :gutter="12"
     :animationDuration="300"
-    v-infinite-scroll="loadingPost" 
+    v-infinite-scroll="loadingPost"
     :infinite-scroll-disabled="isLoading"
   >
     <template #item="{ item, index }">
-      <el-card :key="postData" class="card" shadow="hover" >
+      <el-card :key="postData" class="card" shadow="hover">
         <div class="cardBody">
           <div class="postArea">
             <div class="postInfo">
               <span class="title">{{ item.title }}</span>
             </div>
-            <div class="postOperate"> 
+            <div class="postOperate">
               <!-- 歷史記錄 -->
-              <div class="backBtn" >
+              <div class="backBtn">
                 <el-popover
                   :popper-style="popperStyle"
-                  placement="bottom" 
+                  placement="bottom"
                   trigger="click"
                   hide-after="0"
                   @before-enter="debouncedGetBackup(item.id)"
                 >
                   <div>
-                    <div class="backupTitle"> {{ post.editObj.length ? `Edited ${post.editObj.length - 1} time` : '' }} </div>
-                      <!-- 歷史紀錄 -->
-                      <div 
-                        class="backupList" 
-                        v-show="post.editObj.length > 0" 
-                        @click="showHistory(edit.avatar_url, edit.username, edit.created_at, edit.title, edit.content, edit.action)"
-                        v-for="edit in post.editObj" 
-                        :key="edit.id"
+                    <div class="backupTitle">
+                      {{ post.editObj.length ? `Edited ${post.editObj.length - 1} time` : '' }}
+                    </div>
+                    <!-- 歷史紀錄 -->
+                    <div
+                      class="backupList"
+                      v-show="post.editObj.length > 0"
+                      @click="
+                        showHistory(
+                          edit.avatar_url,
+                          edit.username,
+                          edit.created_at,
+                          edit.title,
+                          edit.content,
+                          edit.action
+                        )
+                      "
+                      v-for="edit in post.editObj"
+                      :key="edit.id"
+                    >
+                      <el-avatar :src="edit.avatar_url" :size="22" class="userAvatar">
+                        <el-icon size="14"><UserFilled /></el-icon>
+                      </el-avatar>
+                      <span class="username">{{ edit.username }}</span>
+                      <span class="date"
+                        >{{ edit.action + ' at' }} {{ formatDate(edit.created_at) }}</span
                       >
-                        <el-avatar :src="edit.avatar_url" :size="22"  class="userAvatar" >
-                          <el-icon size="14"><UserFilled /></el-icon>
-                        </el-avatar>
-                        <span class="username">{{ edit.username }}</span>
-                        <span class="date">{{ edit.action + " at" }} {{ formatDate(edit.created_at) }}</span>
-                      </div>
-                      
+                    </div>
                   </div>
                   <template #reference>
                     <el-icon><List /></el-icon>
@@ -291,7 +314,12 @@ const getLikePost = (async() => {
                 </el-popover>
               </div>
               <!-- 操作按鈕 -->
-              <el-dropdown size="small" trigger="click" class="moreBtn" v-show="item.username === user.userInfo.username">
+              <el-dropdown
+                size="small"
+                trigger="click"
+                class="moreBtn"
+                v-show="item.username === user.userInfo.username"
+              >
                 <font-awesome-icon :icon="['fas', 'ellipsis']" />
                 <template #dropdown>
                   <el-dropdown-menu>
@@ -309,26 +337,32 @@ const getLikePost = (async() => {
             </div>
           </div>
           <div class="time">
-            <span>{{ item.updated_at != null ? "edited at " + formatDate(item.updated_at) : formatDate(item.created_at) }}</span>
+            <span>{{
+              item.updated_at != null
+                ? 'edited at ' + formatDate(item.updated_at)
+                : formatDate(item.created_at)
+            }}</span>
           </div>
           <div class="postContent">
             <p>{{ item.content }}</p>
           </div>
           <div class="cardFooter">
             <div class="cardLike">
-              <font-awesome-icon @click="likePost(user.userInfo.id, item.id, item.isLike, index)" :icon="[`${item.isLike ?'fas' :'far'}`, 'thumbs-up']" />
+              <font-awesome-icon
+                @click="likePost(user.userInfo.id, item.id, item.isLike, index)"
+                :icon="[`${item.isLike ? 'fas' : 'far'}`, 'thumbs-up']"
+              />
               <span class="likeNum">{{ item.like_num }}</span>
             </div>
             <div class="userData">
-              <el-avatar :src="item.avatar_url" :size="22"  class="userAvatar" >
+              <el-avatar :src="item.avatar_url" :size="22" class="userAvatar">
                 <el-icon size="14"><UserFilled /></el-icon>
               </el-avatar>
               <span class="username">{{ item.username }}</span>
             </div>
           </div>
-          
-          <div class="cardBg" @click="routerPostInfo(item.id)">
-          </div>
+
+          <div class="cardBg" @click="routerPostInfo(item.id)"></div>
         </div>
       </el-card>
     </template>
@@ -342,11 +376,7 @@ const getLikePost = (async() => {
       </el-form-item>
       <el-form-item prop="content">
         <span>Content:</span>
-        <el-input
-          v-model="editPostForm.content"
-          type="textarea"
-          placeholder="Content"
-        />
+        <el-input v-model="editPostForm.content" type="textarea" placeholder="Content" />
       </el-form-item>
     </el-form>
     <template #footer>
@@ -357,18 +387,22 @@ const getLikePost = (async() => {
     </template>
   </el-dialog>
   <!-- 歷史記錄 -->
-  <el-dialog v-model="historyDialogVisible"  width="500" class="historyDialog">
+  <el-dialog v-model="historyDialogVisible" width="500" class="historyDialog">
     <div class="historyDialogBody">
       <div class="historyDialogHeader">
-        <el-avatar :src="historyData.avatar_url" :size="22"  class="userAvatar" >
+        <el-avatar :src="historyData.avatar_url" :size="22" class="userAvatar">
           <el-icon size="14"><UserFilled /></el-icon>
         </el-avatar>
         <span class="username">{{ historyData.username }}</span>
         <span class="date">{{ historyData.action }} {{ formatDate(historyData.date) }}</span>
       </div>
       <div class="historyDialogContent">
-        <div class="title"><span>{{ historyData.title }}</span></div>
-        <div class="content"><span>{{ historyData.content }}</span></div>
+        <div class="title">
+          <span>{{ historyData.title }}</span>
+        </div>
+        <div class="content">
+          <span>{{ historyData.content }}</span>
+        </div>
       </div>
     </div>
   </el-dialog>
@@ -463,9 +497,9 @@ const getLikePost = (async() => {
           align-items: center;
           margin-top: 20px;
           justify-content: flex-end;
-          
+
           .userAvatar {
-            margin-right: 5px; 
+            margin-right: 5px;
             position: relative;
             z-index: 1;
           }
@@ -489,7 +523,7 @@ const getLikePost = (async() => {
     }
   }
 }
-.operateLabel{
+.operateLabel {
   margin-left: 5px;
 }
 .backupTitle {
@@ -498,12 +532,13 @@ const getLikePost = (async() => {
   padding: 0 20px;
   font-weight: 600;
 }
-.backupList, .nowList {
+.backupList,
+.nowList {
   display: flex;
   align-items: center;
   border-top: 1px solid var(--el-border-color);
   padding: 10px 20px;
-  &:hover{
+  &:hover {
     cursor: pointer;
   }
   .userAvatar {
@@ -549,5 +584,4 @@ const getLikePost = (async() => {
     }
   }
 }
-
 </style>

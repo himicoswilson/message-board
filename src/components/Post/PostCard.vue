@@ -8,25 +8,24 @@ import { usePostStore } from '@/stores/postStore'
 import { useCountStore } from '@/stores/countStore'
 // 引入 refreshStore
 import { useRefreshStore } from '@/stores/refreshStore'
-import { useRoute } from 'vue-router';
+import { useRoute } from 'vue-router'
 // 引入 formatDate
 import { formatDate } from '@/math/index.js'
 
-const user = useUserStore();
-const post = usePostStore();
-const count = useCountStore();
-const refresh = useRefreshStore();
+const user = useUserStore()
+const post = usePostStore()
+const count = useCountStore()
+const refresh = useRefreshStore()
 
-const route = useRoute();
+const route = useRoute()
 
-const id = route.params.id;
+const id = route.params.id
 
-onMounted(async() => {
+onMounted(async () => {
   await post.apiGetPost(id).then(() => {
-    refresh.cardsReady = true;
+    refresh.cardsReady = true
   })
 })
-
 </script>
 <template>
   <div>
@@ -34,6 +33,4 @@ onMounted(async() => {
   </div>
 </template>
 
-<style lang="less" scoped>
-
-</style>
+<style lang="less" scoped></style>

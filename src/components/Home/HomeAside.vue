@@ -11,88 +11,86 @@ import { useRefreshStore } from '@/stores/refreshStore'
 // 引入 likeStore
 import { useLikeStore } from '@/stores/likeStore'
 
-const user = useUserStore();
-const post = usePostStore();
-const count = useCountStore();
-const refresh = useRefreshStore();
-const like = useLikeStore();
+const user = useUserStore()
+const post = usePostStore()
+const count = useCountStore()
+const refresh = useRefreshStore()
+const like = useLikeStore()
 
-const postForm = ref();
+const postForm = ref()
 const formInline = reactive({
   title: '',
   content: ''
 })
 
 const rules = reactive({
-  title: [
-    { required: true, message: 'Please input title', trigger: 'change' },
-  ],
-  content: [
-    { required: true, message: 'Please input content', trigger: 'change' },
-  ],
+  title: [{ required: true, message: 'Please input title', trigger: 'change' }],
+  content: [{ required: true, message: 'Please input content', trigger: 'change' }]
 })
 
 onMounted(async () => {
   await count.apiGetUserCount()
   await apiGetCountInfo().then(() => {
-    refresh.asideReady = true;
+    refresh.asideReady = true
   })
 })
 
-const apiGetCountInfo = (async () => {
-  await count.apiGetPostCount();
-  await count.apiGetUserPostCount(user.userInfo.id);
-  await count.apiGetUserCountCompare();
-  await count.apiGetPostCountCompare();
-})
+const apiGetCountInfo = async () => {
+  await count.apiGetPostCount()
+  await count.apiGetUserPostCount(user.userInfo.id)
+  await count.apiGetUserCountCompare()
+  await count.apiGetPostCountCompare()
+}
 
-const submitPost = (async () => {
-  await postForm.value.validate();
-  await post.apiPostMsg(formInline.title, formInline.content, user.userInfo.id).then(async() => {
-    await post.apiGetNewPost();
-    post.postObj[0].like_num = 0;
-    await like.apiGetPostLikeNum(post.postObj[0].id);
-    apiGetCountInfo();
-    // eslint-disable-next-line no-undef
-    ElNotification({
-      message: 'post successfully! ',
-      type: 'success',
-      position: 'bottom-right',
+const submitPost = async () => {
+  await postForm.value.validate()
+  await post
+    .apiPostMsg(formInline.title, formInline.content, user.userInfo.id)
+    .then(async () => {
+      await post.apiGetNewPost()
+      post.postObj[0].like_num = 0
+      await like.apiGetPostLikeNum(post.postObj[0].id)
+      apiGetCountInfo()
+      // eslint-disable-next-line no-undef
+      ElNotification({
+        message: 'post successfully! ',
+        type: 'success',
+        position: 'bottom-right'
+      })
     })
-  })
-  .catch((error) => {
-    // eslint-disable-next-line no-undef
-    ElNotification({
-      message: `${error}`,
-      type: 'error',
-      position: 'bottom-right',
-    });
-  });
-  formInline.title = '';
-  formInline.content = '';
-  postForm.value.clearValidate();
-})
+    .catch((error) => {
+      // eslint-disable-next-line no-undef
+      ElNotification({
+        message: `${error}`,
+        type: 'error',
+        position: 'bottom-right'
+      })
+    })
+  formInline.title = ''
+  formInline.content = ''
+  postForm.value.clearValidate()
+}
 
-const submitClear = (() => {
-  formInline.title = '';
-  formInline.content = '';
-})
+const submitClear = () => {
+  formInline.title = ''
+  formInline.content = ''
+}
 
-const handleAvatarSuccess = (async (res) => {
+const handleAvatarSuccess = async (res) => {
   // eslint-disable-next-line no-undef
   ElNotification({
     message: `${res}`,
     type: 'success',
-    position: 'bottom-right',
+    position: 'bottom-right'
   })
   await user.apiGetInfo()
   // 去post.postObj裡尋找與user.username 相同的對象，改變對象裡的avatar_url為user.avatar_url
   post.postObj.forEach((element) => {
     if (element.username === user.userInfo.username) {
-      element.avatar_url = user.userInfo.avatar_url;
+      element.avatar_url = user.userInfo.avatar_url
     }
   })
-})
+}
 
 const beforeAvatarUpload = (rawFile) => {
   if (rawFile.type !== 'image/jpeg' && rawFile.type !== 'image/png') {
@@ -117,14 +115,14 @@ const beforeAvatarUpload = (rawFile) => {
         <span class="postTitle">POST MESSAGE</span>
         <el-form :model="formInline" :rules="rules" ref="postForm">
           <el-form-item prop="title">
-            <el-input v-model="formInline.title"  placeholder="Title..." />
+            <el-input v-model="formInline.title" placeholder="Title..." />
           </el-form-item>
           <el-form-item prop="content">
-            <el-input v-model="formInline.content"  type="textarea" placeholder="Content..." />
+            <el-input v-model="formInline.content" type="textarea" placeholder="Content..." />
           </el-form-item>
           <div class="postButtons">
             <el-form-item>
-            <el-button type="danger" @click="submitClear" class="clearButton">Clear</el-button>
+              <el-button type="danger" @click="submitClear" class="clearButton">Clear</el-button>
             </el-form-item>
             <el-form-item>
               <el-button type="primary" @click="submitPost">Submit</el-button>
@@ -144,7 +142,7 @@ const beforeAvatarUpload = (rawFile) => {
           >
             <el-icon class="avatarUploaderIcon"><Plus /></el-icon>
             <div class="userAvatarMask"></div>
-            <el-avatar :src="user.userInfo.avatar_url" :size="64" class="userAvatar" >
+            <el-avatar :src="user.userInfo.avatar_url" :size="64" class="userAvatar">
               <el-icon size="40"><UserFilled /></el-icon>
             </el-avatar>
           </el-upload>
@@ -161,16 +159,16 @@ const beforeAvatarUpload = (rawFile) => {
             <el-statistic title="User Count" :value="count.userCount" />
             <div class="newUserCount">
               <div class="CaretTop" v-if="count.compareUserCount >= 0">
-                <el-icon >
+                <el-icon>
                   <CaretTop />
                 </el-icon>
-                <span>{{ Math.abs(count.compareUserCount)  }}</span>
+                <span>{{ Math.abs(count.compareUserCount) }}</span>
               </div>
               <div class="CaretBottom" v-else-if="count.compareUserCount < 0">
-                <el-icon >
+                <el-icon>
                   <CaretBottom />
                 </el-icon>
-                <span>{{ Math.abs(count.compareUserCount)  }}</span>
+                <span>{{ Math.abs(count.compareUserCount) }}</span>
               </div>
             </div>
           </div>
@@ -178,16 +176,16 @@ const beforeAvatarUpload = (rawFile) => {
             <el-statistic title="Post Count" :value="count.postCount" />
             <div class="newPostCount">
               <div class="CaretTop" v-if="count.comparePostCount >= 0">
-                <el-icon >
+                <el-icon>
                   <CaretTop />
                 </el-icon>
-                <span>{{ Math.abs(count.comparePostCount)  }}</span>
+                <span>{{ Math.abs(count.comparePostCount) }}</span>
               </div>
               <div class="CaretBottom" v-else-if="count.comparePostCount < 0">
-                <el-icon >
+                <el-icon>
                   <CaretBottom />
                 </el-icon>
-                <span>{{ Math.abs(count.comparePostCount)  }}</span>
+                <span>{{ Math.abs(count.comparePostCount) }}</span>
               </div>
             </div>
           </div>
@@ -220,9 +218,9 @@ const beforeAvatarUpload = (rawFile) => {
       background-color: var(--el-bg-color-overlay);
       border: 1px solid var(--el-border-color);
       border-radius: 4px;
-      transition: .3s;
+      transition: 0.3s;
 
-      &:hover{
+      &:hover {
         box-shadow: var(--el-box-shadow-light);
       }
 
@@ -252,8 +250,8 @@ const beforeAvatarUpload = (rawFile) => {
       border: 1px solid var(--el-border-color);
       border-radius: 4px;
       background-color: var(--el-bg-color-overlay);
-      transition: .3s;
-      &:hover{
+      transition: 0.3s;
+      &:hover {
         box-shadow: var(--el-box-shadow-light);
       }
       .userInfoContent {
@@ -305,8 +303,8 @@ const beforeAvatarUpload = (rawFile) => {
       border: 1px solid var(--el-border-color);
       border-radius: 4px;
       background-color: var(--el-bg-color-overlay);
-      transition: .3s;
-      &:hover{
+      transition: 0.3s;
+      &:hover {
         box-shadow: var(--el-box-shadow-light);
       }
       .statisticCardBody {

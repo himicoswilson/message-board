@@ -8,23 +8,22 @@ import { usePostStore } from '@/stores/postStore'
 import { useCountStore } from '@/stores/countStore'
 // 引入 refreshStore
 import { useRefreshStore } from '@/stores/refreshStore'
-import { useRoute } from 'vue-router';
+import { useRoute } from 'vue-router'
 
-const user = useUserStore();
-const post = usePostStore();
-const count = useCountStore();
-const refresh = useRefreshStore();
+const user = useUserStore()
+const post = usePostStore()
+const count = useCountStore()
+const refresh = useRefreshStore()
 
-const route = useRoute();
+const route = useRoute()
 
-const id = route.params.id;
+const id = route.params.id
 
-onMounted(async() => {
+onMounted(async () => {
   await post.apiGetPost(id).then(() => {
-    refresh.asideReady = true;
+    refresh.asideReady = true
   })
 })
-
 </script>
 <template>
   <div class="postInfoContainer">
@@ -35,14 +34,13 @@ onMounted(async() => {
       <div class="postInfoContent">
         <div class="postInfoContentText">{{ 1 }}</div>
       </div>
-      <div class="postInfoFooter">
-      </div>
+      <div class="postInfoFooter"></div>
     </div>
   </div>
 </template>
 
 <style lang="less" scoped>
-  .postInfoContainer {
-    flex: 1;
-  }
+.postInfoContainer {
+  flex: 1;
+}
 </style>

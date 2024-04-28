@@ -3,12 +3,12 @@
 /* semantic color variables for this project */
 :root {
   --el-text-color-primary: #606266 !important;
-  --color-heading: #1F2328;
+  --color-heading: #1f2328;
   --color-time: #a8a8a7;
   --color-login: #f6f8fa;
 }
 html.dark {
-  --el-text-color-primary: #CFD3DC !important;
+  --el-text-color-primary: #cfd3dc !important;
   --color-heading: #fff;
   --color-time: #a19f9f;
   --color-login: #191919;

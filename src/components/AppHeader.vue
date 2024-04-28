@@ -1,20 +1,20 @@
 <script setup>
 // 引入路由
-import { useRouter } from "vue-router";
+import { useRouter } from 'vue-router'
 // 引入 useUserStore
 import { useUserStore } from '@/stores/userStore'
 // 引入 useRefreshStore
 import { useRefreshStore } from '@/stores/refreshStore'
-import { ref, onMounted, watch, nextTick } from 'vue';
-import { Refresh, Filter, Top, UserFilled, Sunny, Moon } from "@element-plus/icons-vue";
+import { ref, onMounted, watch, nextTick } from 'vue'
+import { Refresh, Filter, Top, UserFilled, Sunny, Moon } from '@element-plus/icons-vue'
 
 const router = useRouter()
 const user = useUserStore()
 const refresh = useRefreshStore()
 
-const dialogVisible = ref(false);
+const dialogVisible = ref(false)
 const isDarkTheme = ref(false)
-const loading = ref(true);
+const loading = ref(true)
 
 onMounted(async () => {
   await user.apiGetInfo().then(() => {
@@ -26,59 +26,59 @@ onMounted(async () => {
 
 onMounted(() => {
   const darkMode = localStorage.getItem('theme')
-  if(darkMode==='dark'){ 
-    document.body.classList.add('dark') 
+  if (darkMode === 'dark') {
+    document.body.classList.add('dark')
     isDarkTheme.value = true
-  } 
+  }
 })
 
-const goHome = (() => {
+const goHome = () => {
   if (router.currentRoute.value.path === '/') {
     refresh.refresh()
     return
   } else {
     router.push('/')
   }
-})
+}
 
-const refreshBtn = (() => {
+const refreshBtn = () => {
   refresh.refresh()
-})
-const goTop = (() => {
+}
+const goTop = () => {
   window.scrollTo({
     top: 0,
-    behavior: "smooth" // 讓捲動有平滑效果
-  });
-})
+    behavior: 'smooth' // 讓捲動有平滑效果
+  })
+}
 
-const logout = (() => {
-  localStorage.removeItem('token');
+const logout = () => {
+  localStorage.removeItem('token')
   router.push('/login')
-})
+}
 
-const logoff = (async() => {
+const logoff = async () => {
   await user.apiLogoff().then(() => {
     // eslint-disable-next-line no-undef
     ElNotification({
       message: 'logoff successfully! ',
       type: 'success',
-      position: 'bottom-right',
-    });
-    logout();
+      position: 'bottom-right'
+    })
+    logout()
   })
-})
+}
 
 watch(isDarkTheme, () => {
-  if( isDarkTheme.value ) {
+  if (isDarkTheme.value) {
     document.documentElement.classList.add('dark')
-    localStorage.setItem('theme','dark')
+    localStorage.setItem('theme', 'dark')
   } else {
     document.documentElement.classList.remove('dark')
-    localStorage.setItem('theme','light')
+    localStorage.setItem('theme', 'light')
   }
-});
+})
 
-// 把el-switch實例傳進函數switchTheme裡 
+// 把el-switch實例傳進函數switchTheme裡
 // const switchTheme = (elSwitch) => {
 //   const transition = document.startViewTransition();
 //   // 拿到el-switch的座標
@@ -89,7 +89,7 @@ watch(isDarkTheme, () => {
 //     Math.max(x, window.innerWidth - x),
 //     Math.max(y, window.innerHeight - y)
 //   );
-  
+
 //   if( isDarkTheme.value ) {
 //     transition.ready.then(() => {
 //       document.documentElement.animate(
@@ -131,10 +131,10 @@ watch(isDarkTheme, () => {
       </div>
       <div class="AppHeader-globalBar-end">
         <!-- 刷新 -->
-        <el-button :icon="Refresh" circle @click="refreshBtn" class="refresh"/>
+        <el-button :icon="Refresh" circle @click="refreshBtn" class="refresh" />
         <!-- 篩選 -->
-        <el-button :icon="Filter" circle @click="dialogVisible = true" class="filter"/>
-        <el-button :icon="Top" circle @click="goTop" class="goTop"/>
+        <el-button :icon="Filter" circle @click="dialogVisible = true" class="filter" />
+        <el-button :icon="Top" circle @click="goTop" class="goTop" />
         <!-- 切換暗色模式 -->
         <el-switch
           v-model="isDarkTheme"
@@ -145,13 +145,23 @@ watch(isDarkTheme, () => {
           @click="switchTheme"
         />
         <!-- 用戶頭像下拉選單：退出登陸 -->
-        <el-skeleton v-if="loading" class="userAvatarPlace" style="--el-skeleton-circle-size: 32px; display: flex;" animated>
+        <el-skeleton
+          v-if="loading"
+          class="userAvatarPlace"
+          style="--el-skeleton-circle-size: 32px; display: flex"
+          animated
+        >
           <template #template>
             <el-skeleton-item variant="circle" />
           </template>
         </el-skeleton>
         <el-dropdown v-if="!loading">
-          <el-avatar :src="user.userInfo.avatar_url" :size="32" :icon="UserFilled" class="userAvatar" />
+          <el-avatar
+            :src="user.userInfo.avatar_url"
+            :size="32"
+            :icon="UserFilled"
+            class="userAvatar"
+          />
           <template #dropdown>
             <el-dropdown-menu>
               <el-dropdown-item @click="logout">退出登陸</el-dropdown-item>
@@ -164,12 +174,7 @@ watch(isDarkTheme, () => {
       </div>
     </div>
   </div>
-  <el-dialog
-    v-model="dialogVisible"
-    title="篩選"
-    width="500"
-    :before-close="handleClose"
-  >
+  <el-dialog v-model="dialogVisible" title="篩選" width="500" :before-close="handleClose">
     <el-form>
       <!-- 選擇哪個用戶 -->
       <el-select v-model="value" placeholder="請選擇用戶">
@@ -184,9 +189,7 @@ watch(isDarkTheme, () => {
     <template #footer>
       <div class="dialog-footer">
         <el-button @click="dialogVisible = false">Cancel</el-button>
-        <el-button type="primary" @click="dialogVisible = false">
-          Confirm
-        </el-button>
+        <el-button type="primary" @click="dialogVisible = false"> Confirm </el-button>
       </div>
     </template>
   </el-dialog>
@@ -217,7 +220,7 @@ watch(isDarkTheme, () => {
         font-size: 16px;
         font-weight: 700;
         line-height: 24px;
-        &:hover{
+        &:hover {
           cursor: pointer;
         }
       }
@@ -229,14 +232,14 @@ watch(isDarkTheme, () => {
       .goTop {
         margin-left: 12px;
       }
-      .el-button{
+      .el-button {
         background-color: var(--el-bg-color);
       }
       .themeSwitch {
         margin-left: 12px;
         --el-switch-on-color: var(--el-bg-color);
         --el-switch-border-color: var(--el-border-color);
-        
+
         // .el-switch__core .el-switch__action {
         //   background-color: var(--el-bg-color) !important;
         // }

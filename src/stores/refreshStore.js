@@ -10,16 +10,16 @@ export const useRefreshStore = defineStore({
     pageLocation: false
   }),
   actions: {
-    switchLoading(){
-      this.loading = false;
-      this.cardsReady = false;
-      this.asideReady = false;
+    switchLoading() {
+      this.loading = false
+      this.cardsReady = false
+      this.asideReady = false
     },
     // refresh
-    refresh(){
-      this.loading = !this.loading;
-      this.flag += 1;
-      this.pageLocation = true;
+    refresh() {
+      this.loading = !this.loading
+      this.flag += 1
+      this.pageLocation = true
     }
-  },
+  }
 })

@@ -34,7 +34,7 @@ a,
   }
 }
 /* switchTheme */
-.el-switch__core .el-switch__action{
+.el-switch__core .el-switch__action {
   background-color: #ffffff !important;
   color: #606266 !important;
 }

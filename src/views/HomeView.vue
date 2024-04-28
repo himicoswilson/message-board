@@ -14,7 +14,6 @@ watch(
     }
   }
 )
-
 </script>
 
 <template>
@@ -33,4 +32,3 @@ watch(
   display: flex;
 }
 </style>
-
